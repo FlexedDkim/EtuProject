@@ -1,5 +1,6 @@
 package com.example.servingwebcontent;
 
+import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,11 +15,21 @@ public class MainController {
         return "main";
     }
     @GetMapping("/login")
-    public String login(Model model) {
-        return "login";
+    public String login(HttpSession session,Model model) {
+        if (session.getAttribute("user") == null) {
+            return "login";
+        }
+        else
+        {
+            return "redirect:/dashboard";
+        }
     }
     @GetMapping("/register")
     public String register(Model model) {
         return "register";
+    }
+    @GetMapping("/error")
+    public String error(Model model) {
+        return "error";
     }
 }
