@@ -25,8 +25,14 @@ public class MainController {
         }
     }
     @GetMapping("/register")
-    public String register(Model model) {
-        return "register";
+    public String register(HttpSession session,Model model) {
+        if (session.getAttribute("user") == null) {
+            return "register";
+        }
+        else
+        {
+            return "redirect:/dashboard";
+        }
     }
     @GetMapping("/error")
     public String error(Model model) {

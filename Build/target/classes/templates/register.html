@@ -13,6 +13,8 @@
   <form id="form-reg">
     <input name="mail" id="mail" placeholder="Почта" type="text" required="">
     <input name="pass" id="pass" placeholder="Пароль" type="password" required="">
+    <center><img id="captcha" src="api/captcha" style="width: 200px; height: 50px;"></center>
+    <input name="captchainput" id="captchainput" placeholder="Код с картинки" type="text" required="">
     <br><input type="button" class="animated infinite pulse" value="Зарегистрироваться" id="btn_submit">
   </form>
   <center><h3>Есть аккаунт? <a href="login">Авторизируйтесь!</a></h3></center>
@@ -20,5 +22,6 @@
 </body>
 
 <script src="js/jquery.js"></script>
+<script src="js/register.js"></script>
 
 </html>
