@@ -19,13 +19,19 @@ body::before {
 }
 .form {
     position: absolute;
-    top: 45%;
-    left: 50%;
     background: #fff;
     width: 285px;
     margin: -140px 0 0 -182px;
     padding: 40px;
     box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
+}
+.form-login {
+    top: 45%;
+    left: 50%;
+}
+.form-register {
+    top: 35%;
+    left: 50%;
 }
 .form h2 {
     margin: 0 0 20px;

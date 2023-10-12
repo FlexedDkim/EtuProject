@@ -29,6 +29,15 @@ public class ApiController {
     @ResponseBody
     @PostMapping("/api/login")
     public String ApiLogin(HttpSession session,@RequestParam(name="mail", required=false) String mail, @RequestParam(name="pass", required=false) String pass, Model model) {
+        mail = mail.trim();
+        pass = pass.trim();
+
+        mail = mail.toLowerCase();
+
+        if (mail == "" || pass == "") {
+            return "Заполните все поля!";
+        }
+
         Optional<User> userOptional = userManager.getUserByMail(mail);
         User isExemplary = null;
         if (userOptional.isPresent()) {
@@ -36,15 +45,21 @@ public class ApiController {
         } else {
             response = "Ошибка в логине или пароле";
         }
-        String salt = isExemplary.getSalt();
-        String securepass = md5(salt + md5(salt + pass + salt));
-        if (mail.equals(isExemplary.getMail()) && securepass.equals(isExemplary.getPass())) {
-            session.setAttribute("user", mail);
-            response = "Вход выполнен!";
-        } else {
+        if (isExemplary != null) {
+            String salt = isExemplary.getSalt();
+            String securepass = md5(salt + md5(salt + pass + salt));
+            if (mail.equals(isExemplary.getMail()) && securepass.equals(isExemplary.getPass())) {
+                session.setAttribute("user", mail);
+                response = "Вход выполнен!";
+            } else {
+                response = "Ошибка в логине или пароле";
+            }
+            model.addAttribute("response", response);
+        }
+        else
+        {
             response = "Ошибка в логине или пароле";
         }
-        model.addAttribute("response", response);
         return response;
     }
 
@@ -56,16 +71,27 @@ public class ApiController {
 
     @ResponseBody
     @PostMapping("/api/register")
-    public String register(HttpSession session,@RequestParam(name="captcha", required=false) String captcha,@RequestParam(name="mail", required=false) String mail, @RequestParam(name="pass", required=false) String pass, Model model) {
+    public String register(HttpSession session,@RequestParam(name="pass_repeat", required=false) String pass_repeat,@RequestParam(name="captcha", required=false) String captcha,@RequestParam(name="mail", required=false) String mail, @RequestParam(name="pass", required=false) String pass, Model model) {
+        mail = mail.trim();
+        pass = pass.trim();
+        captcha = captcha.trim();
+        pass_repeat = pass_repeat.trim();
+
         long currentTimeMillis = System.currentTimeMillis();
         long unixTimestamp = currentTimeMillis / 1000;
 
-        if (mail == "" || pass == "" || captcha == "") {
+        mail = mail.toLowerCase();
+
+        if (mail == "" || pass == "" || captcha == "" || pass_repeat == "") {
             return "Заполните все поля!";
         }
 
         if (!isValidEmail(mail)) {
             return "Почта невалидна!";
+        }
+
+        if (!pass_repeat.equals(pass)) {
+            return "Введённые пароли не совпадают!";
         }
 
         Optional<User> userOptional = UserManager.getUserByMail(mail);
@@ -91,7 +117,7 @@ public class ApiController {
     }
 
     @GetMapping("/api/captcha")
-    public void generateCaptcha(HttpServletResponse response,HttpSession session) throws IOException {
+    public void generateCaptcha(HttpServletResponse response, HttpSession session) throws IOException {
         int width = 200;
         int height = 50;
         int numberOfDigits = 5; // Количество цифр в капче
@@ -113,7 +139,6 @@ public class ApiController {
         Graphics2D g = captchaImage.createGraphics();
         g.setColor(Color.WHITE);
         g.fillRect(0, 0, width, height);
-        g.setColor(Color.BLACK);
         g.setFont(new Font("Arial", Font.PLAIN, 40));
 
         // Отображение каждой цифры на изображении с поворотом и искажением
@@ -122,17 +147,36 @@ public class ApiController {
 
             // Поворот и искажение цифры
             AffineTransform transform = new AffineTransform();
-            transform.rotate(Math.toRadians(random.nextInt(15) - 7), i * 40 + 20, 30);
+            transform.rotate(Math.toRadians(random.nextInt(3) - 1), i * 40 + 20, 20);
             transform.shear(random.nextDouble() - 0.5, random.nextDouble() - 0.5);
             Font transformedFont = g.getFont().deriveFont(transform);
             g.setFont(transformedFont);
 
-            g.drawString(String.valueOf(digit), i * 40 + 20, 40);
+            // Проверка, чтобы крайние цифры не выходили за рамки экрана
+            FontMetrics fm = g.getFontMetrics();
+            int textWidth = fm.stringWidth(String.valueOf(digit));
+            int xPosition = i * 40 + 20;
+            if (xPosition + textWidth > width) {
+                xPosition = width - textWidth - 10;
+            }
+
+            g.setColor(new Color(random.nextInt(256), random.nextInt(256), random.nextInt(256))); // Разноцветные цифры
+            g.drawString(String.valueOf(digit), xPosition, 40);
         }
+
+        // Генерация и добавление шумов на изображение
+        for (int i = 0; i < 1500; i++) {
+            int x = random.nextInt(width);
+            int y = random.nextInt(height);
+            int rgb = random.nextInt(256); // случайный цвет
+            captchaImage.setRGB(x, y, rgb);
+        }
+
         session.setAttribute("captcha", captchaAnswer);
         response.setContentType("image/png");
         ImageIO.write(captchaImage, "png", response.getOutputStream());
         response.getOutputStream().close();
     }
+
 
 }

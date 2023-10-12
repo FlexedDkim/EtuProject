@@ -1,7 +1,7 @@
 $(document).ready(function(){
     $('#btn_submit').click(function(){
-        var mail   = $('#mail').val();
-        var pass = $('#pass').val();
+        let mail   = $('#mail').val();
+        let pass = $('#pass').val();
         $.ajax({
             url: "api/login",
             type: "post",
@@ -14,7 +14,7 @@ $(document).ready(function(){
                 $("#erconts").html("Авторизация...");
             },
             success: function(result){
-                if (result == "Вход выполнен!") {
+                if (result === "Вход выполнен!") {
                     location.reload();
                 }
                 $('#erconts').html(result);
