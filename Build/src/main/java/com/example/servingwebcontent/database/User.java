@@ -40,10 +40,6 @@ public class User {
     public void setDelete(boolean deleted) {
         this.deleted = deleted;
     }
-    public void setDel(boolean deleted) {
-        this.deleted = deleted;
-    }
-
     public void setSalt(String salt) {
         this.salt = salt;
     }
