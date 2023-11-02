@@ -29,36 +29,27 @@ public class ApiController {
     @ResponseBody
     @PostMapping("/api/login")
     public String ApiLogin(HttpSession session,@RequestParam(name="mail", required=false) String mail, @RequestParam(name="pass", required=false) String pass, Model model) {
-        mail = mail.trim();
         pass = pass.trim();
-
-        mail = mail.toLowerCase();
+        mail = mail.trim().toLowerCase();
 
         if (mail == "" || pass == "") {
             return "Заполните все поля!";
         }
 
         Optional<User> userOptional = userManager.getUserByMail(mail);
-        User isExemplary = null;
         if (userOptional.isPresent()) {
-            isExemplary = userOptional.get();
-        } else {
-            response = "Ошибка в логине или пароле";
-        }
-        if (isExemplary != null) {
-            String salt = isExemplary.getSalt();
-            String securepass = md5(salt + md5(salt + pass + salt));
-            if (mail.equals(isExemplary.getMail()) && securepass.equals(isExemplary.getPass())) {
+            User user = userOptional.get();
+            String salt = user.getSalt();
+            String securePass = md5(salt + md5(salt + pass + salt));
+
+            if (mail.equals(user.getMail()) && securePass.equals(user.getPass())) {
                 session.setAttribute("user", mail);
                 response = "Вход выполнен!";
             } else {
-                response = "Ошибка в логине или пароле";
+                response = "Пароль неверный!";
             }
-            model.addAttribute("response", response);
-        }
-        else
-        {
-            response = "Ошибка в логине или пароле";
+        } else {
+            response = "Такого логина не существует!";
         }
         return response;
     }
