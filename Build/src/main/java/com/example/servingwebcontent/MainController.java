@@ -10,9 +10,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class MainController {
 
     @GetMapping("/")
-    public String main(@RequestParam(name="name", required=false, defaultValue="World") String name, Model model) {
-        model.addAttribute("name", name);
-        return "main";
+    public String main(HttpSession session,Model model) {
+        if (session.getAttribute("user") == null) {
+            return "redirect:/login";
+        }
+        else
+        {
+            return "redirect:/dashboard";
+        }
     }
     @GetMapping("/login")
     public String login(HttpSession session,Model model) {
