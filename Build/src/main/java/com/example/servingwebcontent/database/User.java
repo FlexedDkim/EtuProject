@@ -25,6 +25,8 @@ public class User {
     @Column(name = "salt")
     private String salt;
 
+    @Column(name = "usertype")
+    private int usertype;
     public void setId(Long id) {
         this.id = id;
     }
@@ -42,6 +44,9 @@ public class User {
     }
     public void setSalt(String salt) {
         this.salt = salt;
+    }
+    public void setUsertype(String salt) {
+        this.usertype = usertype;
     }
     public Long getId() {
         return id;
@@ -61,4 +66,5 @@ public class User {
     public boolean getDeleted() {
         return deleted;
     }
+    public int getUsertype() {return usertype;}
 }

@@ -1,21 +1,33 @@
 package com.example.servingwebcontent;
 
+import com.example.servingwebcontent.database.Card;
+import com.example.servingwebcontent.database.File;
 import com.example.servingwebcontent.database.User;
-import com.example.servingwebcontent.database.UserManager;
+import com.example.servingwebcontent.managers.CardManager;
+import com.example.servingwebcontent.managers.FileManager;
+import com.example.servingwebcontent.managers.UserManager;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.Optional;
 import java.util.Random;
+
+import java.util.List;
 
 import static com.example.servingwebcontent.func.MainFunction.*;
 
@@ -23,6 +35,8 @@ import static com.example.servingwebcontent.func.MainFunction.*;
 public class ApiController {
     @Autowired
     private UserManager userManager;
+    @Autowired
+    private FileManager fileManager;
     String response = "false";
     String securepass = "";
 
@@ -68,8 +82,7 @@ public class ApiController {
         captcha = captcha.trim();
         pass_repeat = pass_repeat.trim();
 
-        long currentTimeMillis = System.currentTimeMillis();
-        long unixTimestamp = currentTimeMillis / 1000;
+        long unixTimestamp = getCurrentTime();
 
         mail = mail.toLowerCase();
 
@@ -167,6 +180,74 @@ public class ApiController {
         response.setContentType("image/png");
         ImageIO.write(captchaImage, "png", response.getOutputStream());
         response.getOutputStream().close();
+    }
+
+    @RestController
+    @RequestMapping("/api/uploadfiles")
+    public class FileUploadController {
+        private static final String UPLOAD_DIR = "src/main/resources/uploads/";
+        @PostMapping
+        public String handleFileUpload(@RequestParam("selectObject") Long selectObject,@RequestParam("files") List<MultipartFile> files,HttpSession session) {
+            try {
+                for (MultipartFile file : files) {
+                    String checkfile = checkFile(file);
+                    if (checkfile != "ok") {return checkfile;}
+                }
+                String mail = (String) session.getAttribute("user");
+                Long idUser = userManager.getUserByMail(mail).get().getId();
+                Long idCard = createCard(selectObject,idUser);
+                for (MultipartFile file : files) {
+                    saveFile(file,idCard,idUser);
+                }
+                return "Файлы были успешно загружены!";
+            } catch (IOException e) {
+                e.printStackTrace();
+                return "Ошибка при загрузки файлов";
+            }
+        }
+        private void saveFile(MultipartFile file, Long idCard,Long idUser) throws IOException {
+            long fileSize = file.getSize();
+            String realFileName = file.getOriginalFilename();
+            String genFileName = generateUniqueFileName();
+            String fileExtension = getFileExtension(realFileName);
+            Path filePath = Path.of(UPLOAD_DIR + genFileName + '.' + fileExtension);
+            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+            File newFile = new File();
+            newFile.setRealName(realFileName);
+            newFile.setGenName(genFileName);
+            newFile.setTime(getCurrentTime());
+            newFile.setType(fileExtension);
+            newFile.setSize(fileSize);
+            newFile.setIdOwn(idUser);
+            newFile.setIdCard(idCard);
+            newFile.setDeleted(false);
+            FileManager.createFile(newFile);
+        }
+
+        private String checkFile(MultipartFile file) throws IOException {
+            long fileSize = file.getSize();
+            String realFileName = file.getOriginalFilename();
+            String fileExtension = getFileExtension(realFileName);
+
+            if (realFileName.length() > 30) {return "Файл " + realFileName + " имеет слишком длинное имя!";}
+            if (canUploadFile(fileExtension) == false) {return "Тип файла " + fileExtension + " загружать нельзя!";}
+            if (fileSize > 52428800) {return "Файл " + realFileName + " превышает допустимый размер.";}
+
+            return "ok";
+        }
+
+        private Long createCard(Long selectObject, Long idOwn) {
+            Card newCard = new Card();
+            newCard.setName("Новая карточка");
+            newCard.setTime(getCurrentTime());
+            newCard.setIdObject(selectObject);
+            newCard.setDeleted(false);
+            newCard.setIdOwn(idOwn);
+            CardManager.createCard(newCard);
+            return CardManager.createCard(newCard).getId();
+        }
+
     }
 
 

@@ -44,3 +44,31 @@ body {
     padding-right: 0.5rem;
     padding-left: 0.5rem;
 }
+.navbar-brand {
+    margin-right: 0rem;
+}
+.bg-main {
+    background: #FF8C00;
+}
+.navbar-light .navbar-brand {
+    color: rgba(255,255,255,.9);
+}
+.navbar-light .navbar-nav .nav-link {
+    color: rgba(255,255,255,.9);
+}
+.dropzone {
+    border: 2px dashed #FF8C00;
+    border-radius: 5px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    width:100%;
+}
+.dropzone:hover {
+    background-color: #f8f9fa;
+}
+.card {
+    min-width: 200px;
+    min-heigh: 200px;
+    margin: 10px;
+}
