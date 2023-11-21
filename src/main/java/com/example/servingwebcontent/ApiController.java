@@ -88,17 +88,17 @@ public class ApiController {
 
     @ResponseBody
     @PostMapping("/api/register")
-    public String register(HttpSession session,@RequestParam(name="pass_repeat", required=false) String pass_repeat,@RequestParam(name="captcha", required=false) String captcha,@RequestParam(name="mail", required=false) String mail, @RequestParam(name="pass", required=false) String pass, Model model) {
+    public String register(HttpSession session,@RequestParam(name="pass_repeat", required=false) String passrepeat,@RequestParam(name="captcha", required=false) String captcha,@RequestParam(name="mail", required=false) String mail, @RequestParam(name="pass", required=false) String pass, Model model) {
         mail = mail.trim();
         pass = pass.trim();
         captcha = captcha.trim();
-        pass_repeat = pass_repeat.trim();
+        passrepeat = passrepeat.trim();
 
         long unixTimestamp = getCurrentTime();
 
         mail = mail.toLowerCase();
 
-        if (mail == "" || pass == "" || captcha == "" || pass_repeat == "") {
+        if (mail == "" || pass == "" || captcha == "" || passrepeat == "") {
             return "Заполните все поля!";
         }
 
@@ -106,7 +106,7 @@ public class ApiController {
             return "Почта невалидна!";
         }
 
-        if (!pass_repeat.equals(pass)) {
+        if (!passrepeat.equals(pass)) {
             return "Введённые пароли не совпадают!";
         }
 
