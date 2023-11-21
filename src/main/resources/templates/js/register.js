@@ -3,7 +3,7 @@ $(document).ready(function(){
         let mail   = $('#mail').val();
         let pass = $('#pass').val();
         let captchainput = $('#captchainput').val();
-        let passrepeat = $('#pass_repeat').val();
+        let passrepeat = $('#passrepeat').val();
         $.ajax({
             url: "api/register",
             type: "post",
