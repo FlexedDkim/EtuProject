@@ -88,7 +88,7 @@ public class ApiController {
 
     @ResponseBody
     @PostMapping("/api/register")
-    public String register(HttpSession session,@RequestParam(name="pass_repeat", required=false) String passrepeat,@RequestParam(name="captcha", required=false) String captcha,@RequestParam(name="mail", required=false) String mail, @RequestParam(name="pass", required=false) String pass, Model model) {
+    public String register(HttpSession session,@RequestParam(name="passrepeat", required=false) String passrepeat,@RequestParam(name="captcha", required=false) String captcha,@RequestParam(name="mail", required=false) String mail, @RequestParam(name="pass", required=false) String pass, Model model) {
         mail = mail.trim();
         pass = pass.trim();
         captcha = captcha.trim();
