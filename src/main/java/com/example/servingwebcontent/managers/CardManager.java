@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CardManager {
@@ -17,6 +18,13 @@ public class CardManager {
     }
     public static List<Card> readAllByIdOwn(Long idown) {
         return cardRepository.findAllByIdOwn(idown);
+    }
+
+    public static List<Card> readAllByStatus(String status) {
+        return cardRepository.findAllByStatus(status);
+    }
+    public static Optional<Card> readAllById(Long id) {
+        return cardRepository.findAllById(id);
     }
     public static Card createCard(Card card) {
         return cardRepository.save(card);

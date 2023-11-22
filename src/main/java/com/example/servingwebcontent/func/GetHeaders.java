@@ -101,6 +101,8 @@ public class GetHeaders {
                         break;
                     case "edit": response = getCardsUser(idUser);
                         break;
+                    case "comments": response = getCommentsUser(idUser);
+                        break;
                     case "settings": response = getSettingsUser(idUser);
                         break;
                     default:

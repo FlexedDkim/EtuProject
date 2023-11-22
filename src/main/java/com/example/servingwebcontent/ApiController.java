@@ -49,6 +49,8 @@ public class ApiController {
     private UserManager userManager;
     @Autowired
     private FileManager fileManager;
+    @Autowired
+    private CardManager cardManager;
     String response = "false";
     String securepass = "";
 
@@ -127,6 +129,11 @@ public class ApiController {
         registerUser.setTime(unixTimestamp);
         registerUser.setSalt(salt);
         registerUser.setDelete(false);
+        registerUser.setUsertype(0);
+        registerUser.setIdManager(0L);
+        registerUser.setFname("");
+        registerUser.setIname("");
+        registerUser.setOname("");
         UserManager.createUser(registerUser);
         session.setAttribute("user", mail);
         return "Аккаунт зарегистрирован!";
@@ -242,6 +249,10 @@ public class ApiController {
         comment.setDeleted(false);
         CommentManager.createComment(comment);
 
+        Card cardComment = cardManager.readAllById(idCard).get();
+        cardComment.setStatus("open");
+        CardManager.createCard(cardComment);
+
         CommentResponse response = new CommentResponse();
         response.setStatus("success");
         response.setMessage(idText.replace("\n", "<br>"));
@@ -317,6 +328,7 @@ public class ApiController {
             newCard.setDeleted(false);
             newCard.setIdOwn(idOwn);
             newCard.setDescription(descCard);
+            newCard.setStatus("open");
             CardManager.createCard(newCard);
             return CardManager.createCard(newCard).getId();
         }

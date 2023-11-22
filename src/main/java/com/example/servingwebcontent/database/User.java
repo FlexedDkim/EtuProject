@@ -58,7 +58,7 @@ public class User {
     public void setSalt(String salt) {
         this.salt = salt;
     }
-    public void setUsertype(String salt) {
+    public void setUsertype(int usertype) {
         this.usertype = usertype;
     }
 
