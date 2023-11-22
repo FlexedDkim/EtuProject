@@ -118,7 +118,7 @@ public class GetHeaders {
                         break;
                     case "createcard":
                         break;
-                    case "newcomments":
+                    case "newcomments": response = getCommentsForManager(idUser);
                         break;
                     case "settings":response = getSettingsUser(idUser);
                         break;

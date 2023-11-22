@@ -417,7 +417,7 @@ public class MainFunction {
         UserManager userManager = null;
         Optional<User> userOptional = userManager.getUserById(idOwn);
         User userFunc = userOptional.get();
-        List<Card> cards = CardManager.readAllByStatus("inwork");
+        List<Card> cards = CardManager.readAllByIdOwnAndStatus(userFunc.getId(),"inwork");
 
         String cardsHtmlBody = "";
         String cardsHtml = "<div class=\"container\"><div class=\"card-deck\">";
@@ -436,14 +436,17 @@ public class MainFunction {
             String commentsHtml = "";
             List<Comment> comments = CommentManager.readAllByIdCard(card.getId());
             for (Comment comment : comments) {
+                User userComment = userManager.getUserById(comment.getIdOwn()).get();
+                String orientationComments = "second";
+                if (comment.getIdOwn() != idOwn) {orientationComments = "second-resp";}
                 commentsHtml +=
                         "    <div class=\"d-flex justify-content-center py-2\">\n" +
-                                "        <div class=\"second py-2 px-2\">\n" +
+                                "        <div class=\""+orientationComments+" py-2 px-2\">\n" +
                                 "            <span class=\"text1\">" + comment.getBody().replace("\n", "<br>") + "</span>\n" +
                                 "            <div class=\"d-flex justify-content-between py-1 pt-2\">\n" +
                                 "                <div>\n" +
                                 "                    <img src=\"../img/noavatar.png\" width=\"20\">\n" +
-                                "                    <span class=\"text2\">" + userFunc.getFname() + " " + userFunc.getIname().charAt(0) + ". " + userFunc.getOname().charAt(0) + "." + "</span>\n" +
+                                "                    <span class=\"text2\">" + userComment.getFname() + " " + userComment.getIname().charAt(0) + ". " + userComment.getOname().charAt(0) + "." + "</span>\n" +
                                 "                </div>\n" +
                                 "                <div>\n" +
                                 "                    <span class=\"text3\">" + getInNormalDate(comment.getTime()) + "</span>\n" +
@@ -478,6 +481,108 @@ public class MainFunction {
                     "        <div class=\"form-group\">\n" +
                     "          <label for=\"FormControl\">Автор карточки</label>\n" +
                     "          <input type=\"text\" class=\"form-control\" value=\"" + userFunc.getFname() + " " + userFunc.getIname() + " " + userFunc.getOname() + "\" placeholder=\"\" disabled>\n" +
+                    "       </div>  " +
+                    "       <label for=\"FormControl\">Прикреплённые файлы</label>\n"
+                    + filesHtml +
+                    "       <label for=\"FormControl\">Комментарии: <span id=\"commentscounter"+ card.getId() +"\">" + CommentManager.countByIdCard(card.getId()) + "</span></label>\n" +
+                    "           <div class=\"form-group\">\n" +
+                    "<div class=\"container justify-content-center mt-3\">\n" +
+                    " <span id=\"commentsinarea" + card.getId() + "\"> "
+                    + commentsHtml +
+                    "</span>" +
+                    "</div>" +
+                    "<br>" +
+                    "               <label for=\"comment\">Ваш комментарий:</label>\n" +
+                    "               <textarea class=\"form-control\" id=\"newcomment" + card.getId() + "\" rows=\"3\"></textarea>\n" +
+                    "           </div>\n" +
+                    "           <button type=\"button\" class=\"btn bg-main text-light\" onclick=\"submitComment('" + card.getId() + "','newcomment"+ card.getId() +"','commentsinarea" + card.getId() + "')\">Добавить комментарий</button>" +
+                    "      </div>\n" +
+                    "      <div class=\"modal-footer\">\n" +
+                    "        <button type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\">Закрыть</button>\n" +
+                    "      </div>\n" +
+                    "    </div>\n" +
+                    "  </div>\n" +
+                    "</div>";
+        }
+        if (cardsHtmlBody != "") {
+            cardsHtml += cardsHtmlBody + "</div></div>";
+        }
+        else
+        {
+            cardsHtml = "<h1 class=\"display-4\">У вас на доработке нет ни одной карточки</h1>\n" +
+                    "<p>Карточки появятся, как только кто-то отправит вам их на доработку!</p>";
+        }
+        return cardsHtml;
+    }
+
+    public static String getCommentsForManager(Long idOwn) {
+        UserManager userManager = null;
+        List<Card> cards = CardManager.readAllByStatus("open");
+
+        String cardsHtmlBody = "";
+        String cardsHtml = "<div class=\"container\"><div class=\"card-deck\">";
+        for (Card card : cards) {
+            User userCard = userManager.getUserById(card.getIdOwn()).get();
+            if (idOwn != userCard.getIdManager()) {continue;}
+            String filesHtml = "<div class=\"container\"><div class=\"card-deck\">";
+            List<File> files = FileManager.readAllByIdCard(card.getId());
+            for (File file : files) {
+                filesHtml += "<div style=\"margin-bottom: 10px;\" class=\"card\">\n" +
+                        "            <div class=\"card-body\">\n" +
+                        "                <h5 class=\"card-title\">" + file.getRealName() + "</h5>\n" +
+                        "                <p class=\"card-text\">" + convertFileSize(file.getSize()) + "</p>\n" +
+                        "                <a type=\"button\" onclick=\"window.open('/api/download/" + file.getId() + "');\" id=\"fileButton" + file.getId() + "\" class=\"btn bg-main text-light\">Скачать</a>&nbsp;&nbsp;<button type=\"button\" id=\"fileButtonDel" + file.getId() + "\" class=\"btn bg-danger text-light\">Удалить</button>" +
+                        "            </div>\n" +
+                        "        </div>";
+            }
+            String commentsHtml = "";
+            List<Comment> comments = CommentManager.readAllByIdCard(card.getId());
+            for (Comment comment : comments) {
+                User userComment = userManager.getUserById(comment.getIdOwn()).get();
+                String orientationComments = "second";
+                if (comment.getIdOwn() != idOwn) {orientationComments = "second-resp";}
+                commentsHtml +=
+                        "    <div class=\"d-flex justify-content-center py-2\">\n" +
+                                "        <div class=\""+orientationComments+" py-2 px-2\">\n" +
+                                "            <span class=\"text1\">" + comment.getBody().replace("\n", "<br>") + "</span>\n" +
+                                "            <div class=\"d-flex justify-content-between py-1 pt-2\">\n" +
+                                "                <div>\n" +
+                                "                    <img src=\"../img/noavatar.png\" width=\"20\">\n" +
+                                "                    <span class=\"text2\">" + userComment.getFname() + " " + userComment.getIname().charAt(0) + ". " + userComment.getOname().charAt(0) + "." + "</span>\n" +
+                                "                </div>\n" +
+                                "                <div>\n" +
+                                "                    <span class=\"text3\">" + getInNormalDate(comment.getTime()) + "</span>\n" +
+                                "                </div>\n" +
+                                "            </div>\n" +
+                                "        </div>\n" +
+                                "    </div>";
+            }
+            filesHtml += "</div></div>";
+            cardsHtmlBody += "<div style=\"margin-bottom: 10px;\" class=\"card\">\n" +
+                    "            <div class=\"card-body\">\n" +
+                    "                <h5 class=\"card-title\">" + card.getName() + "</h5>\n" +
+                    "                <p class=\"card-text\">" + card.getDescription() + "</p>\n" +
+                    "                <button type=\"button\" id=\"cardButton" + card.getId() + "\" class=\"btn bg-main text-light\" data-toggle=\"modal\" data-target=\"#cardmodal" + card.getId() + "\">Подробнее</button>" +
+                    "            </div>\n" +
+                    "        </div>";
+            cardsHtmlBody += "<div class=\"modal fade\" id=\"cardmodal" + card.getId() + "\" tabindex=\"-1\" aria-labelledby=\"ModalLabel\" aria-hidden=\"true\">\n" +
+                    "  <div class=\"modal-dialog modal-dialog-centered\">\n" +
+                    "    <div class=\"modal-content\">\n" +
+                    "      <div class=\"modal-header\">\n" +
+                    "        <h4 class=\"modal-title fs-5\">" + card.getName() + "</h4>\n" +
+                    "      </div>\n" +
+                    "      <div class=\"modal-body\">\n" +
+                    "       <div class=\"form-group\">\n" +
+                    "          <label for=\"FormControl\">Описание</label>\n" +
+                    "          <input type=\"text\" class=\"form-control\" id=\"desccard\" value=\"" + card.getDescription() + "\" placeholder=\"\" disabled>\n" +
+                    "       </div>  " +
+                    "       <div class=\"form-group\">\n" +
+                    "          <label for=\"FormControl\">Время создания карточки</label>\n" +
+                    "          <input type=\"text\" class=\"form-control\" value=\"" + getInNormalDate(card.getTime()) + "\" placeholder=\"Введите название вашей карточки\" disabled>\n" +
+                    "       </div>  " +
+                    "        <div class=\"form-group\">\n" +
+                    "          <label for=\"FormControl\">Автор карточки</label>\n" +
+                    "          <input type=\"text\" class=\"form-control\" value=\"" + userCard.getFname() + " " + userCard.getIname() + " " + userCard.getOname() + "\" placeholder=\"\" disabled>\n" +
                     "       </div>  " +
                     "       <label for=\"FormControl\">Прикреплённые файлы</label>\n"
                     + filesHtml +

@@ -250,7 +250,7 @@ public class ApiController {
         CommentManager.createComment(comment);
 
         Card cardComment = cardManager.readAllById(idCard).get();
-        cardComment.setStatus("open");
+        if (userAuthor.getUsertype() == 1) {cardComment.setStatus("open");} else {cardComment.setStatus("inwork");}
         CardManager.createCard(cardComment);
 
         CommentResponse response = new CommentResponse();

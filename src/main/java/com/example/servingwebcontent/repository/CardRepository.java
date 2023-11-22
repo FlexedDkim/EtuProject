@@ -11,5 +11,7 @@ public interface CardRepository extends JpaRepository<Card, Long>  {
 
     Optional<Card> findAllById(Long id);
 
+    List<Card> findAllByIdOwnAndStatus(Long idown, String status);
+
     List<Card> findAllByStatus(String status);
 }

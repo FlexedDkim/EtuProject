@@ -20,13 +20,17 @@ public class CardManager {
         return cardRepository.findAllByIdOwn(idown);
     }
 
-    public static List<Card> readAllByStatus(String status) {
-        return cardRepository.findAllByStatus(status);
+    public static List<Card> readAllByIdOwnAndStatus(Long idown,String status) {
+        return cardRepository.findAllByIdOwnAndStatus(idown,status);
     }
     public static Optional<Card> readAllById(Long id) {
         return cardRepository.findAllById(id);
     }
     public static Card createCard(Card card) {
         return cardRepository.save(card);
+    }
+
+    public static List<Card> readAllByStatus(String status) {
+        return cardRepository.findAllByStatus(status);
     }
 }
