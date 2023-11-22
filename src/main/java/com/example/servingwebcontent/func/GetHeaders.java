@@ -121,6 +121,11 @@ public class GetHeaders {
                     case "settings":response = getSettingsUser(idUser);
                         break;
                 }
+            case 3:
+                switch (page) {
+                    case "settings":response = getSettingsUser(idUser);
+                        break;
+                }
             default:
                 break;
         }

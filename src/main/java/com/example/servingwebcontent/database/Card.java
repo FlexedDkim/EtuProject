@@ -28,6 +28,9 @@ public class Card {
     @Column(name = "deleted")
     private Boolean deleted;
 
+    @Column(name = "status")
+    private String status;
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -82,6 +85,14 @@ public class Card {
 
     public String getDescription() {
         return description;
+    }
+
+    public void setStatus(String description) {
+        this.status = status;
+    }
+
+    public String getStatus() {
+        return status;
     }
 
 }
