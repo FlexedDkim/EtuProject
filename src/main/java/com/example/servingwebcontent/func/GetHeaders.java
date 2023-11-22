@@ -34,6 +34,25 @@ public class GetHeaders {
                         "       <a class=\"nav-item nav-link\" href=\"../api/logout\"><i class=\"fa-solid fa-right-from-bracket\" style=\"color:#fff;\"></i></a>\n" +
                         "    </div>";
                 break;
+            case 2:
+                response = " <a class=\"navbar-brand desktop-nav\" href=\"#\">Облако</a>\n" +
+                        "    <div class=\"navbar-nav desktop-nav ml-auto\">\n" +
+                        "       <a class=\"nav-item nav-link\" href=\"../dashboard\">Главная</a>\n" +
+                        "       <a class=\"nav-item nav-link\" href=\"../dashboard/view\">Поиск и редактирование</a>\n" +
+                        "       <a class=\"nav-item nav-link\" href=\"../dashboard/createcard\">Создать карточку</a>\n" +
+                        "       <a class=\"nav-item nav-link\" href=\"../dashboard/newcomments\">Карточки на проверку</a>\n" +
+                        "       <a class=\"nav-item nav-link\" href=\"../dashboard/settings\">Настройки</a>\n" +
+                        "       <a href=\"../api/logout\" class=\"btn btn-outline-light my-2 my-sm-0 ml-2\" type=\"submit\">Выход</a>\n" +
+                        "    </div>\n" +
+                        "    <div class=\"mobile-nav d-lg-none\">\n" +
+                        "       <a class=\"nav-item nav-link\" href=\"../dashboard\"><i class=\"fa-solid fa-house\" style=\"color:#fff;\"></i></a>\n" +
+                        "       <a class=\"nav-item nav-link\" href=\"../dashboard/view\"><i class=\"fa-solid fa-eye\" style=\"color:#fff;\"></i></a>\n" +
+                        "       <a class=\"nav-item nav-link\" href=\"../dashboard/createcard\"><i class=\"fa-solid fa-pen-to-square\" style=\"color:#fff;\"></i></a>\n" +
+                        "       <a class=\"nav-item nav-link\" href=\"../dashboard/newcomments\"><i class=\"fa-solid fa-check-circle\" style=\"color:#fff;\"></i></a>\n" +
+                        "       <a class=\"nav-item nav-link\" href=\"../dashboard/settings\"><i class=\"fa-solid fa-gears\" style=\"color:#fff;\"></i></a>\n" +
+                        "       <a class=\"nav-item nav-link\" href=\"../api/logout\"><i class=\"fa-solid fa-right-from-bracket\" style=\"color:#fff;\"></i></a>\n" +
+                        "    </div>";
+                break;
             default:
                 break;
         }
@@ -88,6 +107,20 @@ public class GetHeaders {
                         break;
                 }
                 break;
+            case 2:
+                switch (page) {
+                    case "main": response = "<h1 class=\"display-4\">Здравствуйте!</h1>\n" +
+                            "    <p>Тут пока ничего нет</p>";
+                        break;
+                    case "view":
+                        break;
+                    case "createcard":
+                        break;
+                    case "newcomments":
+                        break;
+                    case "settings":response = getSettingsUser(idUser);
+                        break;
+                }
             default:
                 break;
         }
