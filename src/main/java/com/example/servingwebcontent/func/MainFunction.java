@@ -159,6 +159,9 @@ public class MainFunction {
             String commentsHtml = "";
             List<Comment> comments = CommentManager.readAllByIdCard(card.getId());
             for (Comment comment : comments) {
+                User userComment = userManager.getUserById(comment.getIdOwn()).get();
+                String orientationComments = "second";
+                if (comment.getIdOwn() != idOwn) {orientationComments = "second-resp";}
                 commentsHtml +=
                         "    <div class=\"d-flex justify-content-center py-2\">\n" +
                         "        <div class=\"second py-2 px-2\">\n" +
@@ -166,7 +169,7 @@ public class MainFunction {
                         "            <div class=\"d-flex justify-content-between py-1 pt-2\">\n" +
                         "                <div>\n" +
                         "                    <img src=\"../img/noavatar.png\" width=\"20\">\n" +
-                        "                    <span class=\"text2\">" + userFunc.getFname() + " " + userFunc.getIname().charAt(0) + ". " + userFunc.getOname().charAt(0) + "." + "</span>\n" +
+                        "                    <span class=\"text2\">" + userComment.getFname() + " " + userComment.getIname().charAt(0) + ". " + userComment.getOname().charAt(0) + "." + "</span>\n" +
                         "                </div>\n" +
                         "                <div>\n" +
                         "                    <span class=\"text3\">" + getInNormalDate(comment.getTime()) + "</span>\n" +
@@ -611,7 +614,7 @@ public class MainFunction {
         }
         else
         {
-            cardsHtml = "<h1 class=\"display-4\">У вас на доработке нет ни одной карточки</h1>\n" +
+            cardsHtml = "<h1 class=\"display-4\">У вас на проверке нет ни одной карточки</h1>\n" +
                     "<p>Карточки появятся, как только кто-то отправит вам их на доработку!</p>";
         }
         return cardsHtml;
