@@ -164,7 +164,7 @@ public class MainFunction {
                 if (comment.getIdOwn() != idOwn) {orientationComments = "second-resp";}
                 commentsHtml +=
                         "    <div class=\"d-flex justify-content-center py-2\">\n" +
-                        "        <div class=\"second py-2 px-2\">\n" +
+                        "        <div class=\""+orientationComments+" py-2 px-2\">\n" +
                         "            <span class=\"text1\">" + comment.getBody().replace("\n", "<br>") + "</span>\n" +
                         "            <div class=\"d-flex justify-content-between py-1 pt-2\">\n" +
                         "                <div>\n" +
