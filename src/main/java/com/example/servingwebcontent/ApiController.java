@@ -476,11 +476,12 @@ public class ApiController {
     @ResponseBody
     @PostMapping("/api/searchengineuser")
     public String SearchEngineUser(HttpSession session,@RequestParam(name="name", required=false) String name) {
-        List<Card> cards = CardManager.readAllByNameIgnoreCase(name);
+        List<Card> cards = CardManager.readAllByNameIgnoreCase(name.describeConstable());
         String resp = "";
         for (Card card : cards) {
             resp += " " +card.getName() + ",";
         }
+        if (resp == "") {resp = "Ничего не найдено!";}
         return resp;
     }
 
