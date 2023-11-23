@@ -14,4 +14,7 @@ public interface CardRepository extends JpaRepository<Card, Long>  {
     List<Card> findAllByIdOwnAndStatus(Long idown, String status);
 
     List<Card> findAllByStatus(String status);
+
+    List<Card> findAllByNameContainingIgnoreCase(String name);
+
 }

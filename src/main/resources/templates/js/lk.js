@@ -209,4 +209,23 @@ $(document).ready(function () {
             }
         });
     });
+
+    $("#searchstart").on("click", function () {
+        let namecard   = $('#namecard').val();
+        $.ajax({
+            url: "/api/searchengineuser",
+            type: "post",
+            data: {
+                "name":   namecard
+            },
+            error:function(){$("#respsearch").html("Ошибка поиска");},
+            beforeSend: function() {
+                $("#respsearch").html("Поиск...");
+            },
+            success: function(result){
+                $("#respsearch").html(result);
+            }
+        });
+    });
+
 });

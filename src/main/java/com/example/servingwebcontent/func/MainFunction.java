@@ -619,4 +619,78 @@ public class MainFunction {
         }
         return cardsHtml;
     }
+
+    public static String getSearchBarUserEdit(Long idOwn) {
+        String searchBar = "<section class=\"search-banner text-white py-5\" id=\"search-banner\">\n" +
+                "    <div class=\"container py-5 my-5\">\n" +
+                "    <div class=\"row text-dark text-center pb-4\">\n" +
+                "        <div class=\"col-md-12\">\n" +
+                "            <h2 id=\"respsearch\">Поиск</h2>\n" +
+                "        </div>\n" +
+                "    </div>   \n" +
+                "    <div class=\"row\">\n" +
+                "        <div class=\"col-md-12\">\n" +
+                "            <div class=\"card\">\n" +
+                "                <div class=\"card-body\">\n" +
+                "                    <div class=\"row\">\n" +
+                "                <div class=\"col\">\n" +
+                "                    <div class=\"form-group \">\n" +
+                " <input class=\"form-control\" type=\"date\" placeholder=\"Поиск с\" aria-label=\"Start date\">" +
+                " <small class=\"form-text text-muted\">Дата, с которой будет производиться поиск</small>" +
+                "                        </div>\n" +
+                "                </div>\n" +
+                "                <div class=\"col\">\n" +
+                "                    <div class=\"form-group \">\n" +
+                " <input class=\"form-control\" type=\"date\" placeholder=\"Поиск до\" aria-label=\"End date\">" +
+                " <small class=\"form-text text-muted\">Дата, до которой будет производиться поиск</small>" +
+                "                        </div>\n" +
+                "                </div>\n" +
+                "                <div class=\"col\">\n" +
+                "                    <div class=\"form-group \">\n" +
+                "                          <select id=\"inputStatus\" class=\"form-control\" >\n" +
+                "                            <option selected>Статус</option>\n" +
+                "                            <option>Открыт</option>\n" +
+                "                            <option>На проверке</option>\n" +
+                "                            <option>Закрыт</option>\n" +
+                "                            \n" +
+                "                          </select>\n" +
+                "                        </div>\n" +
+                "                </div>\n" +
+                "                <div class=\"col\">\n" +
+                "                    <div class=\"form-group \">\n" +
+                "                          <select id=\"inputObject\" class=\"form-control\" >\n" +
+                "                            <option selected>Объект</option>\n" +
+                "           <option value=\"1\">“Восьмое чудо света” – город Великий Новгород, улица Новолучанская, дом 3</option>\n" +
+                "           <option value=\"2\">“Наша эпоха” – город Нижневартовск, улица Нефтяников, дом 91</option>\n" +
+                "           <option value=\"3\">“Изобилие цветов” – город Санкт-Петербург, Невский проспект, дом 49</option>\n" +
+                "           <option value=\"4\">“Великодушие Бога” – город Великие Луки, улица Ухтомского, дом 72</option>\n" +
+                "           <option value=\"5\">“Дьявольский соблазн” – город Санкт-Петербург, улица Московская, дом 115</option>\n" +
+                "                          </select>\n" +
+                "                        </div>\n" +
+                "                </div>\n" +
+                "            </div>\n" +
+                "<div class=\"row\">\n" +
+                "                <div class=\"col\">\n" +
+                "                    <div class=\"form-group \">\n" +
+                " <input class=\"form-control\" id=\"namecard\" type=\"text\" placeholder=\"Название карточки\">" +
+                "                        </div>\n" +
+                "                </div>\n" +
+                "                <div class=\"col\">\n" +
+                "                    <div class=\"form-group \">\n" +
+                " <input class=\"form-control\" type=\"text\" placeholder=\"Описание карточки\">" +
+                "                        </div>\n" +
+                "                </div>\n" +
+                "                <div class=\"col\">\n" +
+                "                    <button type=\"button\" id=\"searchstart\" class=\"btn bg-main text-light\">Найти!</button>\n" +
+                "                </div>\n" +
+                "            </div>\n" +
+                "                </div>\n" +
+                "            </div>\n" +
+                "            \n" +
+                "        </div>\n" +
+                "    </div>\n" +
+                "</div>\n" +
+                "</section>";
+        return searchBar;
+    }
 }

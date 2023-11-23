@@ -29,8 +29,11 @@ public class CardManager {
     public static Card createCard(Card card) {
         return cardRepository.save(card);
     }
-
     public static List<Card> readAllByStatus(String status) {
         return cardRepository.findAllByStatus(status);
+    }
+
+    public static List<Card> readAllByNameIgnoreCase(String name) {
+        return cardRepository.findAllByNameContainingIgnoreCase(name);
     }
 }

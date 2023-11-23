@@ -99,7 +99,7 @@ public class GetHeaders {
                             "      </div>\n" +
                             "      <button type=\"submit\" id=\"uploadButton\" class=\"btn bg-main text-light\">Сохранить</button>\n";
                         break;
-                    case "edit": response = getCardsUser(idUser);
+                    case "edit": response = getSearchBarUserEdit(idUser);
                         break;
                     case "comments": response = getCommentsUser(idUser);
                         break;

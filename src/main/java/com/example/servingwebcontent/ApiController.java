@@ -473,4 +473,15 @@ public class ApiController {
         }
     }
 
+    @ResponseBody
+    @PostMapping("/api/searchengineuser")
+    public String SearchEngineUser(HttpSession session,@RequestParam(name="name", required=false) String name) {
+        List<Card> cards = CardManager.readAllByNameIgnoreCase(name);
+        String resp = "";
+        for (Card card : cards) {
+            resp += " " +card.getName() + ",";
+        }
+        return resp;
+    }
+
 }
