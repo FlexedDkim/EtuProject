@@ -475,11 +475,15 @@ public class ApiController {
 
     @ResponseBody
     @PostMapping("/api/searchengineuser")
-    public String SearchEngineUser(HttpSession session,@RequestParam(name="name", required=false) String name) {
-        List<Card> cards = CardManager.readAllByNameIgnoreCase(name.describeConstable());
+    public String SearchEngineUser(HttpSession session,@RequestParam(name="name", required=false) String name,@RequestParam(name="description", required=false) String description,@RequestParam(name="inputstatus", required=false) String status,@RequestParam(name="inputobject", required=false) Long object,@RequestParam(name="datestart", required=false) String datestart,@RequestParam(name="dateend", required=false) String dateend) {
+        List<Card> cards = CardManager.readAllByNameIgnoreCase(name.describeConstable(),description.describeConstable(),status.describeConstable(),object);
         String resp = "";
+        String mail = (String) session.getAttribute("user");
+        User searchUser = userManager.getUserByMail(mail).get();
         for (Card card : cards) {
-            resp += " " +card.getName() + ",";
+            if (getBetwheenDates(datestart,dateend,card.getTime()) && searchUser.getId() == card.getIdOwn()) {
+                resp += " " + card.getName() + ",";
+            }
         }
         if (resp == "") {resp = "Ничего не найдено!";}
         return resp;

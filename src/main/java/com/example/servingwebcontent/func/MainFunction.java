@@ -20,8 +20,10 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -634,33 +636,31 @@ public class MainFunction {
                 "                <div class=\"card-body\">\n" +
                 "                    <div class=\"row\">\n" +
                 "                <div class=\"col\">\n" +
-                "                    <div class=\"form-group \">\n" +
-                " <input class=\"form-control\" type=\"date\" placeholder=\"Поиск с\" aria-label=\"Start date\">" +
+                "                    <div style=\"margin-bottom: 0rem;\" class=\"form-group \">\n" +
+                " <input class=\"form-control\" type=\"date\" id=\"datestart\" placeholder=\"Поиск с\" aria-label=\"Start date\">" +
                 " <small class=\"form-text text-muted\">Дата, с которой будет производиться поиск</small>" +
                 "                        </div>\n" +
                 "                </div>\n" +
                 "                <div class=\"col\">\n" +
-                "                    <div class=\"form-group \">\n" +
-                " <input class=\"form-control\" type=\"date\" placeholder=\"Поиск до\" aria-label=\"End date\">" +
-                " <small class=\"form-text text-muted\">Дата, до которой будет производиться поиск</small>" +
+                "                    <div style=\"margin-bottom: 0rem;\" class=\"form-group \">\n" +
+                " <input class=\"form-control\" type=\"date\" id=\"dateend\" placeholder=\"Поиск до\" aria-label=\"End date\">" +
+                " <small class=\"form-text text-muted\">Дата, до которой будет производиться поиск (Не включительно)</small>" +
                 "                        </div>\n" +
                 "                </div>\n" +
                 "                <div class=\"col\">\n" +
-                "                    <div class=\"form-group \">\n" +
+                "                    <div style=\"margin-bottom: 0rem;\" class=\"form-group \">\n" +
                 "                          <select id=\"inputStatus\" class=\"form-control\" >\n" +
-                "                            <option selected>Статус</option>\n" +
-                "                            <option>Открыт</option>\n" +
-                "                            <option>На проверке</option>\n" +
-                "                            <option>Закрыт</option>\n" +
+                "                            <option value=\"open\" selected>Открыт</option>\n" +
+                "                            <option value=\"inwork\">На проверке</option>\n" +
+                "                            <option value=\"close\">Закрыт</option>\n" +
                 "                            \n" +
                 "                          </select>\n" +
                 "                        </div>\n" +
                 "                </div>\n" +
                 "                <div class=\"col\">\n" +
-                "                    <div class=\"form-group \">\n" +
+                "                    <div style=\"margin-bottom: 0rem;\" class=\"form-group \">\n" +
                 "                          <select id=\"inputObject\" class=\"form-control\" >\n" +
-                "                            <option selected>Объект</option>\n" +
-                "           <option value=\"1\">“Восьмое чудо света” – город Великий Новгород, улица Новолучанская, дом 3</option>\n" +
+                "           <option value=\"1\" selected>“Восьмое чудо света” – город Великий Новгород, улица Новолучанская, дом 3</option>\n" +
                 "           <option value=\"2\">“Наша эпоха” – город Нижневартовск, улица Нефтяников, дом 91</option>\n" +
                 "           <option value=\"3\">“Изобилие цветов” – город Санкт-Петербург, Невский проспект, дом 49</option>\n" +
                 "           <option value=\"4\">“Великодушие Бога” – город Великие Луки, улица Ухтомского, дом 72</option>\n" +
@@ -671,13 +671,13 @@ public class MainFunction {
                 "            </div>\n" +
                 "<div class=\"row\">\n" +
                 "                <div class=\"col\">\n" +
-                "                    <div class=\"form-group \">\n" +
+                "                    <div style=\"margin-bottom: 0rem;\" class=\"form-group \">\n" +
                 " <input class=\"form-control\" id=\"namecard\" type=\"text\" placeholder=\"Название карточки\">" +
                 "                        </div>\n" +
                 "                </div>\n" +
                 "                <div class=\"col\">\n" +
-                "                    <div class=\"form-group \">\n" +
-                " <input class=\"form-control\" type=\"text\" placeholder=\"Описание карточки\">" +
+                "                    <div style=\"margin-bottom: 0rem;\" class=\"form-group \">\n" +
+                " <input class=\"form-control\" id=\"descriptioncard\" type=\"text\" placeholder=\"Описание карточки\">" +
                 "                        </div>\n" +
                 "                </div>\n" +
                 "                <div class=\"col\">\n" +
@@ -692,5 +692,30 @@ public class MainFunction {
                 "</div>\n" +
                 "</section>";
         return searchBar;
+    }
+
+    public static Long getDateLongInDate(String dateString) {
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate localDate = LocalDate.parse(dateString, formatter);
+        return localDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli() / 1000;
+
+    }
+
+    public static Boolean getBetwheenDates(String datestart, String dateend, Long datecurrent) {
+        if (datestart.trim() == "" && dateend.trim() == "") {
+            return true;
+        }
+        if (datestart.trim() != "" && dateend.trim() == "") {
+            if (getDateLongInDate(datestart) < datecurrent) {return true;} else {return false;}
+        }
+        if (datestart.trim() == "" && dateend.trim() != "") {
+            if (getDateLongInDate(dateend) > datecurrent) {return true;} else {return false;}
+        }
+        if (datestart.trim() != "" && dateend.trim() != "") {
+            if (getDateLongInDate(dateend) > datecurrent && getDateLongInDate(datestart) < datecurrent) {return true;} else {
+            }
+        }
+        return false;
     }
 }

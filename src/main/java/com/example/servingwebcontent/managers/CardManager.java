@@ -33,7 +33,7 @@ public class CardManager {
         return cardRepository.findAllByStatus(status);
     }
 
-    public static List<Card> readAllByNameIgnoreCase(Optional<String> name) {
-        return cardRepository.findAllByNameContainingIgnoreCase(name);
+    public static List<Card> readAllByNameIgnoreCase(Optional<String> name,Optional<String> description,Optional<String> status,Long idobject) {
+        return cardRepository.findAllByNameContainingIgnoreCaseAndDescriptionContainingIgnoreCaseAndStatusContainingIgnoreCaseAndIdObject(name,description,status,idobject);
     }
 }

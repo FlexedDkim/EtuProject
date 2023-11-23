@@ -2,6 +2,7 @@ package com.example.servingwebcontent.repository;
 
 import com.example.servingwebcontent.database.Card;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,6 +16,6 @@ public interface CardRepository extends JpaRepository<Card, Long>  {
 
     List<Card> findAllByStatus(String status);
 
-    List<Card> findAllByNameContainingIgnoreCase(Optional<String> name);
+    List<Card> findAllByNameContainingIgnoreCaseAndDescriptionContainingIgnoreCaseAndStatusContainingIgnoreCaseAndIdObject(Optional<String> name,Optional<String> description,Optional<String> status,Long idobject);
 
 }
