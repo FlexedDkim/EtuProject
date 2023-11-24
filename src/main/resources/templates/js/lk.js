@@ -282,4 +282,32 @@ $(document).ready(function () {
         });
     });
 
+    $("#searchstartformanager").on("click", function () {
+        let namecard   = $('#namecard').val();
+        let description = $('#descriptioncard').val();
+        let inputStatus   = $('#inputStatus').val();
+        let inputObject = $('#inputObject').val();
+        let datestart = $('#datestart').val();
+        let dateend = $('#dateend').val();
+        $.ajax({
+            url: "/api/searchengineuser",
+            type: "post",
+            data: {
+                "name":   namecard,
+                "description": description,
+                "inputstatus": inputStatus,
+                "inputobject": inputObject,
+                "datestart": datestart,
+                "dateend": dateend
+            },
+            error:function(){$("#respsearch").html("Ошибка поиска");},
+            beforeSend: function() {
+                $("#respsearch").html("Поиск...");
+            },
+            success: function(result){
+                $("#respsearch").html(result.messageup);
+                $("#respsearchbottom").html(result.messagedown);
+            }
+        });
+    });
 });

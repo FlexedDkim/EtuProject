@@ -102,4 +102,19 @@ public class DashBoardController {
             return "redirect:/login";
         }
     }
+
+    @GetMapping("/dashboard/view")
+    public String dashboardUserViewAndEdit(HttpSession session, Model model) {
+        if (session.getAttribute("user") != null && userManager.getUserByMail((String) session.getAttribute("user")).get().getUsertype() == 2) {
+            String userSession = (String) session.getAttribute("user");
+            Optional<User> userOptional = userManager.getUserByMail(userSession);
+            User userDashBoard = userOptional.get();
+            model.addAttribute("head", GetHeaders.GetHead(userDashBoard.getUsertype()));
+            model.addAttribute("body", GetHeaders.GetBody(userDashBoard.getUsertype(), "view",userDashBoard.getId()));
+            model.addAttribute("footer", GetHeaders.GetFooter());
+            return "lk";
+        } else {
+            return "redirect:/login";
+        }
+    }
 }

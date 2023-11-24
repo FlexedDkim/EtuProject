@@ -114,7 +114,7 @@ public class GetHeaders {
                     case "main": response = "<h1 class=\"display-4\">Здравствуйте!</h1>\n" +
                             "    <p>Тут пока ничего нет</p>";
                         break;
-                    case "view":
+                    case "view": response = getSearchBarManagerEdit(idUser);
                         break;
                     case "createcard":
                         break;

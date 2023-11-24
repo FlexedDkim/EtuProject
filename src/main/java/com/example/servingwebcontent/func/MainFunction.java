@@ -747,4 +747,97 @@ public class MainFunction {
         }
         return false;
     }
+
+    public static String getSearchBarManagerEdit(Long idUser) {
+        String searchBar = "<section class=\"search-banner py-5\" id=\"search-banner\">\n" +
+                "    <div class=\"container py-5 my-5\">\n" +
+                "    <div class=\"row text-dark text-center pb-4\">\n" +
+                "        <div class=\"col-md-12\">\n" +
+                "            <h2 id=\"respsearch\">Поиск</h2>\n" +
+                "        </div>\n" +
+                "    </div>   \n" +
+                "    <div class=\"row\">\n" +
+                "        <div class=\"col-md-12\">\n" +
+                "            <div class=\"card\">\n" +
+                "                <div class=\"card-body\">\n" +
+                "                    <div class=\"row\">\n" +
+                "                <div class=\"col\">\n" +
+                "                    <div style=\"margin-bottom: 0rem;\" class=\"form-group \">\n" +
+                " <input class=\"form-control\" type=\"date\" id=\"datestart\" placeholder=\"Поиск с\" aria-label=\"Start date\">" +
+                " <small class=\"form-text text-muted\">Дата, с которой будет производиться поиск</small>" +
+                "                        </div>\n" +
+                "                </div>\n" +
+                "                <div class=\"col\">\n" +
+                "                    <div style=\"margin-bottom: 0rem;\" class=\"form-group \">\n" +
+                " <input class=\"form-control\" type=\"date\" id=\"dateend\" placeholder=\"Поиск до\" aria-label=\"End date\">" +
+                " <small class=\"form-text text-muted\">Дата, до которой будет производиться поиск (Не включительно)</small>" +
+                "                        </div>\n" +
+                "                </div>\n" +
+                "                <div class=\"col\">\n" +
+                "                    <div style=\"margin-bottom: 0rem;\" class=\"form-group \">\n" +
+                "                          <select id=\"inputStatus\" class=\"form-control\" >\n" +
+                "                            <option value=\"open\" selected>Открыт</option>\n" +
+                "                            <option value=\"inwork\">На проверке</option>\n" +
+                "                            <option value=\"close\">Закрыт</option>\n" +
+                "                            \n" +
+                "                          </select>\n" +
+                "                        </div>\n" +
+                "                </div>\n" +
+                "                <div class=\"col\">\n" +
+                "                    <div style=\"margin-bottom: 0rem;\" class=\"form-group \">\n" +
+                "                          <select id=\"inputObject\" class=\"form-control\" >\n" +
+                "           <option value=\"1\" selected>“Восьмое чудо света” – город Великий Новгород, улица Новолучанская, дом 3</option>\n" +
+                "           <option value=\"2\">“Наша эпоха” – город Нижневартовск, улица Нефтяников, дом 91</option>\n" +
+                "           <option value=\"3\">“Изобилие цветов” – город Санкт-Петербург, Невский проспект, дом 49</option>\n" +
+                "           <option value=\"4\">“Великодушие Бога” – город Великие Луки, улица Ухтомского, дом 72</option>\n" +
+                "           <option value=\"5\">“Дьявольский соблазн” – город Санкт-Петербург, улица Московская, дом 115</option>\n" +
+                "                          </select>\n" +
+                "                        </div>\n" +
+                "                </div>\n" +
+                "            </div>\n" +
+
+                "<div class=\"row\">\n" +
+                "                <div class=\"col\">\n" +
+                "                    <div class=\"form-group \">\n" +
+                " <input class=\"form-control\" id=\"namecard\" type=\"text\" placeholder=\"Название карточки\">" +
+                "                        </div>\n" +
+                "                </div>\n" +
+                "                <div class=\"col\">\n" +
+                "                    <div class=\"form-group \">\n" +
+                " <input class=\"form-control\" id=\"descriptioncard\" type=\"text\" placeholder=\"Описание карточки\">" +
+                "                        </div>\n" +
+                "                </div>\n" +
+                "            </div>\n" +
+
+                "<div class=\"row\">\n" +
+                "                <div class=\"col\">\n" +
+                "                    <div style=\"margin-bottom: 0rem;\" class=\"form-group \">\n" +
+                " <input class=\"form-control\" id=\"fnameauthorcard\" type=\"text\" placeholder=\"Фамилия автора карточки\">" +
+                "                        </div>\n" +
+                "                </div>\n" +
+                "                <div class=\"col\">\n" +
+                "                    <div style=\"margin-bottom: 0rem;\" class=\"form-group \">\n" +
+                " <input class=\"form-control\" id=\"inameauthorcard\" type=\"text\" placeholder=\"Имя автора карточки\">" +
+                "                        </div>\n" +
+                "                </div>\n" +
+                "                <div class=\"col\">\n" +
+                "                    <div style=\"margin-bottom: 0rem;\" class=\"form-group \">\n" +
+                " <input class=\"form-control\" id=\"onameauthorcard\" type=\"text\" placeholder=\"Отчество автора карточки\">" +
+                "                        </div>\n" +
+                "                </div>\n" +
+                "                <div class=\"col\">\n" +
+                "                    <button type=\"button\" id=\"searchstartformanager\" class=\"btn bg-main text-light\">Найти!</button>\n" +
+                "                </div>\n" +
+                "            </div>\n" +
+
+                "                </div>\n" +
+                "            </div>\n" +
+                "            \n" +
+                "        </div>\n" +
+                "    </div>\n" +
+                "<div id=\"respsearchbottom\"></div>" +
+                "</div>\n" +
+                "</section>";
+        return searchBar;
+    }
 }
