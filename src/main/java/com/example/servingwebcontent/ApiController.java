@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -375,6 +376,63 @@ public class ApiController {
                     .body(resource);
         }
     }
+    @ResponseBody
+    @PostMapping("/api/deletefile")
+    public Object ApiDeleteFile(HttpSession session, @RequestParam(name="idfile", required=false) Long idfile) {
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        class DeleteResponse {
+            @JsonProperty("status")
+            private String status;
+            @JsonProperty("name")
+            private String name;
+
+            public void setStatus(String status) {
+                this.status = status;
+            }
+
+            public void setName(String message) {
+                this.name = message;
+            }
+
+        }
+        Long idUser = userManager.getUserByMail((String) session.getAttribute("user")).get().getId();
+        Optional<File> userOptional = fileManager.readAllById(idfile);
+        if (userOptional.isPresent()) {
+            File fileDelete = userOptional.get();
+            if (idUser == fileDelete.getIdOwn()) {
+                DeleteResponse response = new DeleteResponse();
+                response.setStatus("success");
+                response.setName(fileDelete.getRealName() + " [Удалёно]");
+                String uploadDirectory = "resource/uploads/" + fileDelete.getGenName() + "." + fileDelete.getType();
+                FileManager FileDelete = null;
+                fileDelete.setDeleted(true);
+                FileDelete.createFile(fileDelete);
+                try {
+                    Path path = Paths.get(uploadDirectory);
+                    boolean isDeleted = Files.deleteIfExists(path);
+
+                    if (isDeleted) {
+                        System.out.println("Файл успешно удален: " + uploadDirectory);
+                    } else {
+                        System.out.println("Файл не существует: " + uploadDirectory);
+                    }
+
+                } catch (IOException e) {
+                    System.err.println("Ошибка удаления файла: " + e.getMessage());
+                }
+                return response;
+            }
+        }
+        else
+        {
+            DeleteResponse response = new DeleteResponse();
+            response.setStatus("fail");
+            response.setName("fail");
+            return response;
+        }
+
+        return response;
+    }
 
     @ResponseBody
     @PostMapping("/api/newmailcreate")
@@ -475,18 +533,69 @@ public class ApiController {
 
     @ResponseBody
     @PostMapping("/api/searchengineuser")
-    public String SearchEngineUser(HttpSession session,@RequestParam(name="name", required=false) String name,@RequestParam(name="description", required=false) String description,@RequestParam(name="inputstatus", required=false) String status,@RequestParam(name="inputobject", required=false) Long object,@RequestParam(name="datestart", required=false) String datestart,@RequestParam(name="dateend", required=false) String dateend) {
+    public Object SearchEngineUser(HttpSession session,@RequestParam(name="name", required=false) String name,@RequestParam(name="description", required=false) String description,@RequestParam(name="inputstatus", required=false) String status,@RequestParam(name="inputobject", required=false) Long object,@RequestParam(name="datestart", required=false) String datestart,@RequestParam(name="dateend", required=false) String dateend) {
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        class SearchResponse {
+            @JsonProperty("status")
+            private String status;
+            @JsonProperty("messageup")
+            private String messageUp;
+            @JsonProperty("messagedown")
+            private String messageDown;
+
+            public void setStatus(String status) {
+                this.status = status;
+            }
+
+            public void setMessageUp(String message) {
+                this.messageUp = message;
+            }
+
+            public void setMessageDown(String message) {
+                this.messageDown = message;
+            }
+
+        }
         List<Card> cards = CardManager.readAllByNameIgnoreCase(name.describeConstable(),description.describeConstable(),status.describeConstable(),object);
-        String resp = "";
+        String resp = "<table class=\"table\">\n" +
+                "  <thead>\n" +
+                "    <tr>\n" +
+                "      <th scope=\"col\">#</th>\n" +
+                "      <th scope=\"col\">Название</th>\n" +
+                "      <th scope=\"col\">Описание</th>\n" +
+                "      <th scope=\"col\">Редактирование</th>\n" +
+                "    </tr>\n" +
+                "  </thead>\n" +
+                "  <tbody>";
+        String respmodal = "";
+        int counter = 0;
         String mail = (String) session.getAttribute("user");
         User searchUser = userManager.getUserByMail(mail).get();
         for (Card card : cards) {
             if (getBetwheenDates(datestart,dateend,card.getTime()) && searchUser.getId() == card.getIdOwn()) {
-                resp += " " + card.getName() + ",";
+                counter++;
+                resp += "<tr>\n" +
+                        "      <th scope=\"row\">"+counter+"</th>\n" +
+                        "      <td>"+card.getName()+"</td>\n" +
+                        "      <td>"+card.getDescription()+"</td>\n" +
+                        "      <td><button type=\"button\" id=\"editcardbtn"+card.getId()+"\" data-toggle=\"modal\" data-target=\"#editcard" + card.getId() + "\" class=\"btn bg-main text-light\">Посмотреть</button></td>\n" +
+                        "    </tr>";
+                respmodal+=getCardsUser(card,searchUser.getId());
             }
         }
-        if (resp == "") {resp = "Ничего не найдено!";}
-        return resp;
+        if (counter == 0) {
+            resp = "Ничего не найдено!";
+        } else {
+            resp+= "</tbody>\n" +
+                    "</table>" + respmodal;
+        }
+
+        SearchResponse response = new SearchResponse();
+        response.setStatus("success");
+        response.setMessageUp("Результатов найдено: " + counter);
+        response.setMessageDown(resp);
+
+        return response;
     }
 
 }

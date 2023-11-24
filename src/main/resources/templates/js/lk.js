@@ -59,6 +59,26 @@ function submitComment(id,idarea,idcommarea) {
     });
 }
 
+function deleteFile(idfile) {
+    $.ajax({
+        url: "/api/deletefile",
+        type: "post",
+        data: {
+            "idfile": idfile
+        },
+        error: function () {
+        },
+        beforeSend: function () {
+        },
+        success: function (result) {
+            if (result.status == "success") {
+                $('#namecard' + idfile).html(result.name);
+                document.getElementById("btnDeletedFile" + idfile).disabled = true;
+                document.getElementById("btnDownloadFile" + idfile).disabled = true;
+            }
+        }
+    });
+}
 $(document).ready(function () {
     $("#uploadButton").on("click", function () {
         var fileInput = $("#fileUpload")[0];
@@ -233,7 +253,8 @@ $(document).ready(function () {
                 $("#respsearch").html("Поиск...");
             },
             success: function(result){
-                $("#respsearch").html(result);
+                $("#respsearch").html(result.messageup);
+                $("#respsearchbottom").html(result.messagedown);
             }
         });
     });

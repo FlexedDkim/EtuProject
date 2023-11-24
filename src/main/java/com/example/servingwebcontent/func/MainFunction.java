@@ -138,33 +138,39 @@ public class MainFunction {
         return unixTimestamp;
     }
 
-    public static String getCardsUser(Long idOwn) {
+    public static String getCardsUser(Card card,Long idOwn) {
         UserManager userManager = null;
         Optional<User> userOptional = userManager.getUserById(idOwn);
         User userFunc = userOptional.get();
-        List<Card> cards = CardManager.readAllByIdOwn(idOwn);
-
         String cardsHtmlBody = "";
-        String cardsHtml = "<div class=\"container\"><div class=\"card-deck\">";
-        for (Card card : cards) {
-            String filesHtml = "<div class=\"container\"><div class=\"card-deck\">";
-            List<File> files = FileManager.readAllByIdCard(card.getId());
-            for (File file : files) {
-                filesHtml += "<div style=\"margin-bottom: 10px;\" class=\"card\">\n" +
-                        "            <div class=\"card-body\">\n" +
-                        "                <h5 class=\"card-title\">" + file.getRealName() + "</h5>\n" +
-                        "                <p class=\"card-text\">" + convertFileSize(file.getSize()) + "</p>\n" +
-                        "                <a type=\"button\" onclick=\"window.open('/api/download/" + file.getId() + "');\" id=\"fileButton" + file.getId() + "\" class=\"btn bg-main text-light\">Скачать</a>&nbsp;&nbsp;<button type=\"button\" id=\"fileButtonDel" + file.getId() + "\" class=\"btn bg-danger text-light\">Удалить</button>" +
-                        "            </div>\n" +
-                        "        </div>";
+        String filesHtml = "<div class=\"container\"><div class=\"card-deck\">";
+        List<File> files = FileManager.readAllByIdCard(card.getId());
+        for (File file : files) {
+            String delBtn = "";
+            String deletedAttribyte = "";
+            String deletedAttribyteName = "";
+            if (file.getDeleted() == true) {
+                deletedAttribyte = "disabled";
+                deletedAttribyteName = "[Удалено]";
             }
-            String commentsHtml = "";
-            List<Comment> comments = CommentManager.readAllByIdCard(card.getId());
-            for (Comment comment : comments) {
-                User userComment = userManager.getUserById(comment.getIdOwn()).get();
-                String orientationComments = "second";
-                if (comment.getIdOwn() != idOwn) {orientationComments = "second-resp";}
-                commentsHtml +=
+            if (idOwn == userFunc.getId()) {
+                delBtn = "&nbsp;&nbsp;<button type=\"button\" onclick=\"deleteFile('"+file.getId()+"')\" id=\"btnDeletedFile" + file.getId() + "\" class=\"btn bg-danger text-light\" "+deletedAttribyte+">Удалить</button>";
+            }
+            filesHtml += "<div id=\"filecard"+file.getId()+"\" style=\"margin-bottom: 10px;\" class=\"card\">\n" +
+                    "            <div class=\"card-body\">\n" +
+                    "                <h5 id=\"namecard\" class=\"card-title\">" + file.getRealName() + " " + deletedAttribyteName + " </h5>\n" +
+                    "                <p class=\"card-text\">" + convertFileSize(file.getSize()) + "</p>\n" +
+                    "                <button type=\"button\" onclick=\"window.open('/api/download/" + file.getId() + "');\" id=\"btnDownloadFile" + file.getId() + "\" class=\"btn bg-main text-light\" "+deletedAttribyte+">Скачать</button>" + delBtn +
+                    "            </div>\n" +
+                    "        </div>";
+        }
+        String commentsHtml = "";
+        List<Comment> comments = CommentManager.readAllByIdCard(card.getId());
+        for (Comment comment : comments) {
+            User userComment = userManager.getUserById(comment.getIdOwn()).get();
+            String orientationComments = "second";
+            if (comment.getIdOwn() != idOwn) {orientationComments = "second-resp";}
+            commentsHtml +=
                         "    <div class=\"d-flex justify-content-center py-2\">\n" +
                         "        <div class=\""+orientationComments+" py-2 px-2\">\n" +
                         "            <span class=\"text1\">" + comment.getBody().replace("\n", "<br>") + "</span>\n" +
@@ -179,16 +185,9 @@ public class MainFunction {
                         "            </div>\n" +
                         "        </div>\n" +
                         "    </div>";
-            }
-            filesHtml += "</div></div>";
-            cardsHtmlBody += "<div style=\"margin-bottom: 10px;\" class=\"card\">\n" +
-                    "            <div class=\"card-body\">\n" +
-                    "                <h5 class=\"card-title\">" + card.getName() + "</h5>\n" +
-                    "                <p class=\"card-text\">" + card.getDescription() + "</p>\n" +
-                    "                <button type=\"button\" id=\"cardButton" + card.getId() + "\" class=\"btn bg-main text-light\" data-toggle=\"modal\" data-target=\"#cardmodal" + card.getId() + "\">Подробнее</button>" +
-                    "            </div>\n" +
-                    "        </div>";
-            cardsHtmlBody += "<div class=\"modal fade\" id=\"cardmodal" + card.getId() + "\" tabindex=\"-1\" aria-labelledby=\"ModalLabel\" aria-hidden=\"true\">\n" +
+        }
+        filesHtml += "</div></div>";
+        cardsHtmlBody += "<div class=\"modal fade\" id=\"editcard" + card.getId() + "\" tabindex=\"-1\" aria-labelledby=\"ModalLabel\" aria-hidden=\"true\">\n" +
                     "  <div class=\"modal-dialog modal-dialog-centered\">\n" +
                     "    <div class=\"modal-content\">\n" +
                     "      <div class=\"modal-header\">\n" +
@@ -227,17 +226,8 @@ public class MainFunction {
                     "      </div>\n" +
                     "    </div>\n" +
                     "  </div>\n" +
-                    "</div>";
-        }
-        if (cardsHtmlBody != "") {
-            cardsHtml += cardsHtmlBody + "</div></div>";
-        }
-        else
-        {
-            cardsHtml = "<h1 class=\"display-4\">У вас нет ни одной карточки</h1>\n" +
-                "<p><a href=\"/dashboard/upload\">Создайте свою первую карточку</a></p>";
-        }
-        return cardsHtml;
+                    "</div></div></div>";
+        return cardsHtmlBody;
     }
 
     public static LocalDateTime getInNormalDate(Long Unix) {
@@ -430,11 +420,21 @@ public class MainFunction {
             String filesHtml = "<div class=\"container\"><div class=\"card-deck\">";
             List<File> files = FileManager.readAllByIdCard(card.getId());
             for (File file : files) {
-                filesHtml += "<div style=\"margin-bottom: 10px;\" class=\"card\">\n" +
+                String delBtn = "";
+                String deletedAttribyte = "";
+                String deletedAttribyteName = "";
+                if (file.getDeleted() == true) {
+                    deletedAttribyte = "disabled";
+                    deletedAttribyteName = "[Удалено]";
+                }
+                if (idOwn == userFunc.getId()) {
+                    delBtn = "&nbsp;&nbsp;<button type=\"button\" onclick=\"deleteFile('"+file.getId()+"')\" id=\"btnDeletedFile" + file.getId() + "\" class=\"btn bg-danger text-light\" "+deletedAttribyte+">Удалить</button>";
+                }
+                filesHtml += "<div id=\"filecard"+file.getId()+"\" style=\"margin-bottom: 10px;\" class=\"card\">\n" +
                         "            <div class=\"card-body\">\n" +
-                        "                <h5 class=\"card-title\">" + file.getRealName() + "</h5>\n" +
+                        "                <h5 id=\"namecard\" class=\"card-title\">" + file.getRealName() + " " + deletedAttribyteName + " </h5>\n" +
                         "                <p class=\"card-text\">" + convertFileSize(file.getSize()) + "</p>\n" +
-                        "                <a type=\"button\" onclick=\"window.open('/api/download/" + file.getId() + "');\" id=\"fileButton" + file.getId() + "\" class=\"btn bg-main text-light\">Скачать</a>&nbsp;&nbsp;<button type=\"button\" id=\"fileButtonDel" + file.getId() + "\" class=\"btn bg-danger text-light\">Удалить</button>" +
+                        "                <button type=\"button\" onclick=\"window.open('/api/download/" + file.getId() + "');\" id=\"btnDownloadFile" + file.getId() + "\" class=\"btn bg-main text-light\" "+deletedAttribyte+">Скачать</button>" + delBtn +
                         "            </div>\n" +
                         "        </div>";
             }
@@ -532,11 +532,21 @@ public class MainFunction {
             String filesHtml = "<div class=\"container\"><div class=\"card-deck\">";
             List<File> files = FileManager.readAllByIdCard(card.getId());
             for (File file : files) {
-                filesHtml += "<div style=\"margin-bottom: 10px;\" class=\"card\">\n" +
+                String delBtn = "";
+                String deletedAttribyte = "";
+                String deletedAttribyteName = "";
+                if (file.getDeleted() == true) {
+                    deletedAttribyte = "disabled";
+                    deletedAttribyteName = "[Удалено]";
+                }
+                if (idOwn == userCard.getId()) {
+                    delBtn = "&nbsp;&nbsp;<button type=\"button\" onclick=\"deleteFile('"+file.getId()+"')\" id=\"btnDeletedFile" + file.getId() + "\" class=\"btn bg-danger text-light\" "+deletedAttribyte+">Удалить</button>";
+                }
+                filesHtml += "<div id=\"filecard"+file.getId()+"\" style=\"margin-bottom: 10px;\" class=\"card\">\n" +
                         "            <div class=\"card-body\">\n" +
-                        "                <h5 class=\"card-title\">" + file.getRealName() + "</h5>\n" +
+                        "                <h5 id=\"namecard\" class=\"card-title\">" + file.getRealName() + " " + deletedAttribyteName + " </h5>\n" +
                         "                <p class=\"card-text\">" + convertFileSize(file.getSize()) + "</p>\n" +
-                        "                <a type=\"button\" onclick=\"window.open('/api/download/" + file.getId() + "');\" id=\"fileButton" + file.getId() + "\" class=\"btn bg-main text-light\">Скачать</a>&nbsp;&nbsp;<button type=\"button\" id=\"fileButtonDel" + file.getId() + "\" class=\"btn bg-danger text-light\">Удалить</button>" +
+                        "                <button type=\"button\" onclick=\"window.open('/api/download/" + file.getId() + "');\" id=\"btnDownloadFile" + file.getId() + "\" class=\"btn bg-main text-light\" "+deletedAttribyte+">Скачать</button>" + delBtn +
                         "            </div>\n" +
                         "        </div>";
             }
@@ -623,7 +633,7 @@ public class MainFunction {
     }
 
     public static String getSearchBarUserEdit(Long idOwn) {
-        String searchBar = "<section class=\"search-banner text-white py-5\" id=\"search-banner\">\n" +
+        String searchBar = "<section class=\"search-banner py-5\" id=\"search-banner\">\n" +
                 "    <div class=\"container py-5 my-5\">\n" +
                 "    <div class=\"row text-dark text-center pb-4\">\n" +
                 "        <div class=\"col-md-12\">\n" +
@@ -689,6 +699,7 @@ public class MainFunction {
                 "            \n" +
                 "        </div>\n" +
                 "    </div>\n" +
+                "<div id=\"respsearchbottom\"></div>" +
                 "</div>\n" +
                 "</section>";
         return searchBar;
