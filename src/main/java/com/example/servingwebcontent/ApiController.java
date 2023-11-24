@@ -202,68 +202,153 @@ public class ApiController {
         response.getOutputStream().close();
     }
 
-    @ResponseBody
-    @PostMapping("/api/createcomment")
-    public Object ApiCreateComment(HttpSession session,@RequestParam(name="idcard", required=false) Long idCard, @RequestParam(name="idtext", required=false) String idText) {
-        @JsonInclude(JsonInclude.Include.NON_NULL)
-        class CommentResponse {
-            @JsonProperty("status")
-            private String status;
-            @JsonProperty("message")
-            private String message;
-            @JsonProperty("date")
-            private LocalDateTime date;
-            @JsonProperty("fio")
-            private String fio;
-            @JsonProperty("count")
-            private Long count;
+    @RestController
+    @RequestMapping("/api/createcomment")
+    public class CommentUploadController {
+        private static final String UPLOAD_DIR = "src/main/resources/uploads/";
 
-            public void setStatus(String status) {
-                this.status = status;
+        @PostMapping
+        public Object ApiCreateComment(HttpSession session, @RequestParam(name = "idcard", required = false) Long idCard, @RequestParam(name = "idtext", required = true) String idText, @RequestParam(name = "files", required = false) List<MultipartFile> files) {
+            @JsonInclude(JsonInclude.Include.NON_NULL)
+            class CommentResponse {
+                @JsonProperty("status")
+                private String status;
+                @JsonProperty("message")
+                private String message;
+                @JsonProperty("date")
+                private LocalDateTime date;
+                @JsonProperty("fio")
+                private String fio;
+                @JsonProperty("count")
+                private Long count;
+                @JsonProperty("card")
+                private String card;
+
+                public void setStatus(String status) {
+                    this.status = status;
+                }
+
+                public void setMessage(String message) {
+                    this.message = message;
+                }
+
+                public void setDate(LocalDateTime date) {
+                    this.date = date;
+                }
+
+                public void setFio(String fio) {
+                    this.fio = fio;
+                }
+
+                public void setCount(Long count) {
+                    this.count = count;
+                }
+
+                public void setCards(String card) {
+                    this.card = card;
+                }
+
             }
 
-            public void setMessage(String message) {
-                this.message = message;
+            if (idText.trim().equals("") || idText == null) {
+                return false;
             }
-
-            public void setDate(LocalDateTime date) {
-                this.date = date;
+            if (files != null) {
+                for (MultipartFile file : files) {
+                    String checkfile = null;
+                    try {
+                        checkfile = checkFile(file);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    if (checkfile != "ok") {
+                        return checkfile;
+                    }
+                }
             }
+            User userAuthor = userManager.getUserByMail((String) session.getAttribute("user")).get();
 
-            public void setFio(String fio) {
-                this.fio = fio;
+            Comment comment = new Comment();
+            comment.setIdOwn(userAuthor.getId());
+            comment.setIdCard(idCard);
+            comment.setBody(idText);
+            comment.setTime(getCurrentTime());
+            comment.setDeleted(false);
+            CommentManager.createComment(comment);
+
+            Card cardComment = cardManager.readAllById(idCard).get();
+
+            String tmpText = "";
+            if (files != null) {
+                for (MultipartFile file : files) {
+                    try {
+                        tmpText += createTmpCard(saveFile(file, idCard, userAuthor.getId()));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
             }
-
-            public void setCount(Long count) {
-                this.count = count;
+            if (userAuthor.getUsertype() == 1) {
+                cardComment.setStatus("open");
+            } else {
+                cardComment.setStatus("inwork");
             }
+            CardManager.createCard(cardComment);
 
+            CommentResponse response = new CommentResponse();
+            response.setStatus("success");
+            response.setMessage(idText.replace("\n", "<br>"));
+            response.setDate(getInNormalDate(getCurrentTime()));
+            response.setFio(userAuthor.getFname() + " " + userAuthor.getIname().charAt(0) + ". " + userAuthor.getOname().charAt(0) + ".");
+            response.setCount(CommentManager.countByIdCard(idCard));
+            response.setCards(tmpText);
+
+            return response;
         }
 
-        if (idText.trim() == "") {return false;}
-        
-        User userAuthor = userManager.getUserByMail((String) session.getAttribute("user")).get();
+        private File saveFile(MultipartFile file, Long idCard,Long idUser) throws IOException {
+            long fileSize = file.getSize();
+            String realFileName = file.getOriginalFilename();
+            String genFileName = generateUniqueFileName();
+            String fileExtension = getFileExtension(realFileName);
+            Path filePath = Path.of(UPLOAD_DIR + genFileName + '.' + fileExtension);
+            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
-        Comment comment = new Comment();
-        comment.setIdOwn(userAuthor.getId());
-        comment.setIdCard(idCard);
-        comment.setBody(idText);
-        comment.setTime(getCurrentTime());
-        comment.setDeleted(false);
-        CommentManager.createComment(comment);
+            File newFile = new File();
+            newFile.setRealName(realFileName);
+            newFile.setGenName(genFileName);
+            newFile.setTime(getCurrentTime());
+            newFile.setType(fileExtension);
+            newFile.setSize(fileSize);
+            newFile.setIdOwn(idUser);
+            newFile.setIdCard(idCard);
+            newFile.setDeleted(false);
+            FileManager.createFile(newFile);
+            return newFile;
+        }
 
-        Card cardComment = cardManager.readAllById(idCard).get();
-        if (userAuthor.getUsertype() == 1) {cardComment.setStatus("open");} else {cardComment.setStatus("inwork");}
-        CardManager.createCard(cardComment);
+        private String checkFile(MultipartFile file) throws IOException {
+            long fileSize = file.getSize();
+            String realFileName = file.getOriginalFilename();
+            String fileExtension = getFileExtension(realFileName);
 
-        CommentResponse response = new CommentResponse();
-        response.setStatus("success");
-        response.setMessage(idText.replace("\n", "<br>"));
-        response.setDate(getInNormalDate(getCurrentTime()));
-        response.setFio(userAuthor.getFname() + " " + userAuthor.getIname().charAt(0) + ". " + userAuthor.getOname().charAt(0) + ".");
-        response.setCount(CommentManager.countByIdCard(idCard));
+            if (realFileName.length() > 30) {return "Файл " + realFileName + " имеет слишком длинное имя!";}
+            if (canUploadFile(fileExtension) == false) {return "Тип файла " + fileExtension + " загружать нельзя!";}
+            if (fileSize > 52428800) {return "Файл " + realFileName + " превышает допустимый размер.";}
 
-        return response;
+            return "ok";
+        }
+
+        private String createTmpCard(File fileObj) throws IOException {
+            String delBtn = "&nbsp;&nbsp;<button type=\"button\" onclick=\"deleteFile('"+fileObj.getId()+"')\" id=\"btnDeletedFile" + fileObj.getId() + "\" class=\"btn bg-danger text-light\">Удалить</button>";
+            return "<div id=\"filecard"+fileObj.getId()+"\" style=\"margin-bottom: 10px;\" class=\"card\">\n" +
+                    "            <div class=\"card-body\">\n" +
+                    "                <h5 id=\"namecard"+fileObj.getId()+"\" class=\"card-title\">" + fileObj.getRealName() + "</h5>\n" +
+                    "                <p class=\"card-text\">" + convertFileSize(fileObj.getSize()) + "</p>\n" +
+                    "                <button type=\"button\" onclick=\"window.open('/api/download/" + fileObj.getId() + "');\" id=\"btnDownloadFile" + fileObj.getId() + "\" class=\"btn bg-main text-light\">Скачать</button>" + delBtn +
+                    "            </div>\n" +
+                    "        </div>";
+        }
     }
 
     @RestController
@@ -288,7 +373,7 @@ public class ApiController {
                 return "Файлы были успешно загружены!";
             } catch (IOException e) {
                 e.printStackTrace();
-                return "Ошибка при загрузки файлов";
+                return "Ошибка при загрузке файлов";
             }
         }
         private void saveFile(MultipartFile file, Long idCard,Long idUser) throws IOException {

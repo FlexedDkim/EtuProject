@@ -23,17 +23,31 @@ function updateLabel(files, id) {
 }
 
 function submitComment(id,idarea,idcommarea) {
+    var fileInput = $("#fileUpload" + id)[0];
+    var files = fileInput.files;
+    var formData = new FormData();
+
+    $.each(files, function(index, file) {
+        formData.append("files", file);
+    });
     let idtext = $('#' + idarea).val();
+    formData.append("idcard", id);
+    formData.append("idtext", idtext);
     $.ajax({
         url: "/api/createcomment",
-        type: "post",
-        data: {
-            "idcard": id,
-            "idtext": idtext
-        },
-        error: function () {
-        },
-        beforeSend: function () {
+        type: "POST",
+        data: formData,
+        processData: false,
+        contentType: false,
+        xhr: function () {
+            var xhr = new window.XMLHttpRequest();
+            xhr.upload.addEventListener("progress", function (evt) {
+                if (evt.lengthComputable) {
+                    var percentComplete = (evt.loaded / evt.total) * 100;
+                    $("#progressBar").text(percentComplete.toFixed(2) + "%");
+                }
+            }, false);
+            return xhr;
         },
         success: function (result) {
             if (result.status == "success") {
@@ -56,7 +70,15 @@ function submitComment(id,idarea,idcommarea) {
                 $('#' + idcommarea).append(resultshow);
                 $('#' + idarea).val("");
                 $('#commentscounter' + id).html(result.count);
+                $('#filecontainer' + id).append(result.card);
+                const label = document.getElementById('fileUpload' + id).nextElementSibling;
+                const labelDefaultText = 'Кликните или перетащите файлы сюда для загрузки';
+                label.textContent = labelDefaultText;
+                $("#fileUpload" + id).val(null);
             }
+        },
+        error: function () {
+            $("#progressBar").text("Ошибка загрузки файла.");
         }
     });
 }
