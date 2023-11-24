@@ -402,19 +402,20 @@ public class ApiController {
             if (idUser == fileDelete.getIdOwn()) {
                 DeleteResponse response = new DeleteResponse();
                 response.setStatus("success");
-                response.setName(fileDelete.getRealName() + " [Удалёно]");
-                String uploadDirectory = "resource/uploads/" + fileDelete.getGenName() + "." + fileDelete.getType();
+                response.setName(fileDelete.getRealName() + " [Удалено]");
+                String currentDir = System.getProperty("user.dir");
+                String file = fileDelete.getGenName() + "." + fileDelete.getType();
                 FileManager FileDelete = null;
                 fileDelete.setDeleted(true);
                 FileDelete.createFile(fileDelete);
                 try {
-                    Path path = Paths.get(uploadDirectory);
+                    Path path = Paths.get(Path.of(currentDir,"src","main","resources","uploads",file).toUri());
                     boolean isDeleted = Files.deleteIfExists(path);
 
                     if (isDeleted) {
-                        System.out.println("Файл успешно удален: " + uploadDirectory);
+                        System.out.println("Файл успешно удален: " + Path.of(currentDir,"src","main","resources","uploads",file).toUri());
                     } else {
-                        System.out.println("Файл не существует: " + uploadDirectory);
+                        System.out.println("Файл не существует: " + Path.of(currentDir,"src","main","resources","uploads",file).toUri());
                     }
 
                 } catch (IOException e) {

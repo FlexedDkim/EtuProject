@@ -158,7 +158,7 @@ public class MainFunction {
             }
             filesHtml += "<div id=\"filecard"+file.getId()+"\" style=\"margin-bottom: 10px;\" class=\"card\">\n" +
                     "            <div class=\"card-body\">\n" +
-                    "                <h5 id=\"namecard\" class=\"card-title\">" + file.getRealName() + " " + deletedAttribyteName + " </h5>\n" +
+                    "                <h5 id=\"namecard"+file.getId()+"\" class=\"card-title\">" + file.getRealName() + " " + deletedAttribyteName + " </h5>\n" +
                     "                <p class=\"card-text\">" + convertFileSize(file.getSize()) + "</p>\n" +
                     "                <button type=\"button\" onclick=\"window.open('/api/download/" + file.getId() + "');\" id=\"btnDownloadFile" + file.getId() + "\" class=\"btn bg-main text-light\" "+deletedAttribyte+">Скачать</button>" + delBtn +
                     "            </div>\n" +
@@ -432,7 +432,7 @@ public class MainFunction {
                 }
                 filesHtml += "<div id=\"filecard"+file.getId()+"\" style=\"margin-bottom: 10px;\" class=\"card\">\n" +
                         "            <div class=\"card-body\">\n" +
-                        "                <h5 id=\"namecard\" class=\"card-title\">" + file.getRealName() + " " + deletedAttribyteName + " </h5>\n" +
+                        "                <h5 id=\"namecard"+file.getId()+"\" class=\"card-title\">" + file.getRealName() + " " + deletedAttribyteName + " </h5>\n" +
                         "                <p class=\"card-text\">" + convertFileSize(file.getSize()) + "</p>\n" +
                         "                <button type=\"button\" onclick=\"window.open('/api/download/" + file.getId() + "');\" id=\"btnDownloadFile" + file.getId() + "\" class=\"btn bg-main text-light\" "+deletedAttribyte+">Скачать</button>" + delBtn +
                         "            </div>\n" +
@@ -544,7 +544,7 @@ public class MainFunction {
                 }
                 filesHtml += "<div id=\"filecard"+file.getId()+"\" style=\"margin-bottom: 10px;\" class=\"card\">\n" +
                         "            <div class=\"card-body\">\n" +
-                        "                <h5 id=\"namecard\" class=\"card-title\">" + file.getRealName() + " " + deletedAttribyteName + " </h5>\n" +
+                        "                <h5 id=\"namecard"+file.getId()+"\" class=\"card-title\">" + file.getRealName() + " " + deletedAttribyteName + " </h5>\n" +
                         "                <p class=\"card-text\">" + convertFileSize(file.getSize()) + "</p>\n" +
                         "                <button type=\"button\" onclick=\"window.open('/api/download/" + file.getId() + "');\" id=\"btnDownloadFile" + file.getId() + "\" class=\"btn bg-main text-light\" "+deletedAttribyte+">Скачать</button>" + delBtn +
                         "            </div>\n" +
