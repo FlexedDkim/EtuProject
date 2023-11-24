@@ -240,6 +240,8 @@ public class ApiController {
 
         }
 
+        if (idText.trim() == "") {return false;}
+        
         User userAuthor = userManager.getUserByMail((String) session.getAttribute("user")).get();
 
         Comment comment = new Comment();

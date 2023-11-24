@@ -92,8 +92,8 @@ public class GetHeaders {
                             "      </select>\n" +
                             "      </div>" +
                             "      <div class=\"form-group\">\n" +
-                            "           <label for=\"fileUpload\" class=\"dropzone\" ondragover=\"onDragOver(event)\" ondrop=\"onDrop(event)\">\n" +
-                            "               <input id=\"fileUpload\" type=\"file\" name=\"files\" multiple=\"multiple\" style=\"display: none;\" onchange=\"onFileSelect(event)\">\n" +
+                            "           <label for=\"fileUpload1\" class=\"dropzone\" data-my-value=\"1\" ondragover=\"onDragOver(event)\" ondrop=\"onDrop(event)\">\n" +
+                            "               <input id=\"fileUpload1\" type=\"file\" name=\"files\" data-my-value=\"1\" multiple=\"multiple\" style=\"display: none;\" onchange=\"onFileSelect(event)\">\n" +
                             "               <span>Кликните или перетащите файлы сюда для загрузки</span>\n" +
                             "           </label>\n" +
                             "      </div>\n" +

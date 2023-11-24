@@ -5,17 +5,19 @@ function onDragOver(event) {
 function onDrop(event) {
     event.preventDefault(); // Предотвращаем стандартное поведение браузера
     const files = event.dataTransfer.files; // Получаем перетаскиваемые файлы
-    const fileInput = document.getElementById('fileUpload');
+    const id = event.target.dataset.myValue;
+    const fileInput = document.getElementById('fileUpload' + id);
     fileInput.files = files; // Устанавливаем файлы в элемент input
-    updateLabel(files); // Обновляем текст лейбла
+    updateLabel(files,id); // Обновляем текст лейбла
 }
 
 function onFileSelect(event) {
-    updateLabel(event.target.files); // Обновляем текст лейбла
+    const id = event.target.dataset.myValue;
+    updateLabel(event.target.files,id); // Обновляем текст лейбла
 }
 
-function updateLabel(files) {
-    const label = document.getElementById('fileUpload').nextElementSibling;
+function updateLabel(files, id) {
+    const label = document.getElementById('fileUpload' + id).nextElementSibling;
     const labelDefaultText = 'Кликните или перетащите файлы сюда для загрузки';
     label.textContent = files.length ? Array.from(files).map(f => f.name).join(', ') : labelDefaultText;
 }
@@ -81,9 +83,8 @@ function deleteFile(idfile) {
 }
 $(document).ready(function () {
     $("#uploadButton").on("click", function () {
-        var fileInput = $("#fileUpload")[0];
+        var fileInput = $("#fileUpload1")[0];
         var files = fileInput.files;
-
         if (files.length > 0) {
             uploadFiles(files);
         } else {

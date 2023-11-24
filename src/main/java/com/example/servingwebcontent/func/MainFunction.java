@@ -208,6 +208,12 @@ public class MainFunction {
                     "       </div>  " +
                     "       <label for=\"FormControl\">Прикреплённые файлы</label>\n"
                     + filesHtml +
+                    "<div class=\"form-group\">\n" +
+                    "           <label for=\"fileUpload"+ card.getId() +"\" class=\"dropzone\" ondragover=\"onDragOver(event)\" data-my-value=\""+ card.getId() +"\" ondrop=\"onDrop(event)\">\n" +
+                    "               <input id=\"fileUpload"+ card.getId() +"\" type=\"file\" data-my-value=\""+ card.getId() +"\" name=\"files\" multiple=\"multiple\" style=\"display: none;\" onchange=\"onFileSelect(event)\">\n" +
+                    "               <span>Кликните или перетащите файлы сюда для загрузки</span>\n" +
+                    "           </label>\n" +
+                    "      </div>" +
                     "       <label for=\"FormControl\">Комментарии: <span id=\"commentscounter"+ card.getId() +"\">" + CommentManager.countByIdCard(card.getId()) + "</span></label>\n" +
                     "           <div class=\"form-group\">\n" +
                     "<div class=\"container justify-content-center mt-3\">\n" +
