@@ -9,12 +9,15 @@ import com.example.servingwebcontent.managers.FileManager;
 import com.example.servingwebcontent.managers.UserManager;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.springframework.core.io.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -27,6 +30,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -370,25 +374,44 @@ public class ApiController {
     @Controller
     @RequestMapping("/api/download")
     public class FileDownloadController {
-        private final String uploadDirectory = "uploads/";
-        @GetMapping("/{originalId:.+}")
-        public ResponseEntity<InputStreamResource> downloadFile(@PathVariable Long originalId,HttpSession session) throws IOException {
-            if (session.getAttribute("user") == null) {return ResponseEntity.notFound().build();}
+
+        private final Path uploadDirectory = Paths.get("src/main/resources/uploads/").toAbsolutePath().normalize();
+
+        @GetMapping("/{originalId}")
+        public ResponseEntity<Resource> downloadFile(@PathVariable Long originalId, HttpSession session) {
+            if (session.getAttribute("user") == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+
             Optional<File> downloadFile = fileManager.readAllById(originalId);
-            if (!downloadFile.isPresent()) {return ResponseEntity.notFound().build();}
-            String RealFileName = downloadFile.get().getRealName();
-            String originalFileName = downloadFile.get().getGenName();
-            String filePath = uploadDirectory + originalFileName + "." + downloadFile.get().getType();
-            ClassPathResource classPathResource = new ClassPathResource(filePath);
-            if (!classPathResource.exists()) {
+            if (!downloadFile.isPresent()) {
                 return ResponseEntity.notFound().build();
             }
-            Path tempFilePath = Files.createTempFile("tempFile-", RealFileName);
-            Files.copy(classPathResource.getInputStream(), tempFilePath, StandardCopyOption.REPLACE_EXISTING);
-            InputStream inputStream = Files.newInputStream(tempFilePath);
-            InputStreamResource resource = new InputStreamResource(inputStream);
+
+            File fileInfo = downloadFile.get();
+            String realFileName = fileInfo.getRealName();
+            String generatedFileName = fileInfo.getGenName();
+            String fileExtension = fileInfo.getType();
+
+            Path filePath = uploadDirectory.resolve(generatedFileName + "." + fileExtension);
+
+            if (!Files.exists(filePath)) {
+                return ResponseEntity.notFound().build();
+            }
+
+            Resource resource;
+            try {
+                resource = new UrlResource(filePath.toUri());
+                if (!resource.exists()) {
+                    return ResponseEntity.notFound().build();
+                }
+            } catch (MalformedURLException e) {
+                return ResponseEntity.internalServerError().build();
+            }
+
             HttpHeaders headers = new HttpHeaders();
-            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + RealFileName);
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + realFileName + "\"");
+
             return ResponseEntity.ok()
                     .headers(headers)
                     .contentType(MediaType.APPLICATION_OCTET_STREAM)

@@ -11,7 +11,7 @@ $(document).ready(function(){
                 "mail":   mail,
                 "pass":   pass,
                 "captcha":   captchainput,
-                "pass_repeat":   pass_repeat
+                "passrepeat":   passrepeat
             },
             error:function(){$("#erconts").html("Ошибка регистрации!");},
             beforeSend: function() {
