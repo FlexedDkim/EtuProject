@@ -401,7 +401,7 @@ $(document).ready(function () {
     });
 });
 
-function saveData(inputId, value,id) {
+function saveData(inputId, value,id,datasmall) {
     $.ajax({
         url: "/api/savedataadmin",
         type: "post",
@@ -410,12 +410,12 @@ function saveData(inputId, value,id) {
             "inputid": inputId,
             "value": value,
         },
-        error:function(){$("#" +inputId + id).html("Ошибка сохранения значения");},
+        error:function(){$("#" + datasmall + id).html("Ошибка сохранения");},
         beforeSend: function() {
-            $("#" +inputId + id).html("Сохранение...");
+            $("#" + datasmall + id).html("Сохранение...");
         },
         success: function(result){
-            $("#" +inputId + id).html(result);
+            $("#" + datasmall + id).html(result);
         }
     });
 }
@@ -427,12 +427,13 @@ function setupInput(input) {
         const inputId = event.target.id;
         const value = event.target.value;
         const dataid = event.target.getAttribute('data-id');
+        const datasmall = event.target.getAttribute('data-respinput');
         if (dataid) {
             if (timeoutId) {
                 clearTimeout(timeoutId);
             }
             timeoutId = setTimeout(() => {
-                saveData(inputId, value, dataid);
+                saveData(inputId, value, dataid,datasmall);
             }, 1000);
         }
     });

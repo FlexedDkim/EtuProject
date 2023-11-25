@@ -135,21 +135,6 @@ public class DashBoardController {
         }
     }
 
-    @GetMapping("/dashboard/newandedit")
-    public String dashboardUserCreateUsers(HttpSession session, Model model) {
-        if (session.getAttribute("user") != null && userManager.getUserByMail((String) session.getAttribute("user")).get().getUsertype() == 3) {
-            String userSession = (String) session.getAttribute("user");
-            Optional<User> userOptional = userManager.getUserByMail(userSession);
-            User userDashBoard = userOptional.get();
-            model.addAttribute("head", GetHeaders.GetHead(userDashBoard.getUsertype()));
-            model.addAttribute("body", GetHeaders.GetBody(userDashBoard.getUsertype(), "newandedit",userDashBoard.getId()));
-            model.addAttribute("footer", GetHeaders.GetFooter());
-            return "lk";
-        } else {
-            return "redirect:/login";
-        }
-    }
-
     @GetMapping("/dashboard/searchusers")
     public String dashboardUserCreateAndEditUsers(HttpSession session, Model model) {
         if (session.getAttribute("user") != null && userManager.getUserByMail((String) session.getAttribute("user")).get().getUsertype() == 3) {

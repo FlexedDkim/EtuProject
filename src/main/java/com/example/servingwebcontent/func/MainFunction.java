@@ -1029,36 +1029,6 @@ public class MainFunction {
                 "      <button type=\"submit\" id=\"uploadButton\" class=\"btn bg-main text-light\">Сохранить</button>\n";
     }
 
-    public static String createNew(Long idUser) {
-        return "<h1 class=\"display-4\">Добавление и редактирование</h1>  " +
-                "<div id=\"progressBar\"></div>" +
-                "<div class=\"form-group\">\n" +
-                "    <label for=\"FormControl\">Название</label>\n" +
-                "    <input type=\"text\" class=\"form-control\" id=\"namecard\" placeholder=\"Введите название вашей карточки\">\n" +
-                "  </div>  " +
-                "<div class=\"form-group\">\n" +
-                "    <label for=\"FormControl\">Описание</label>\n" +
-                "    <input type=\"text\" class=\"form-control\" id=\"desccard\" placeholder=\"Введите описание вашей карточки\">\n" +
-                "  </div>" +
-                "      <div class=\"form-group\">\n" +
-                "      <label for=\"itemSelect\">Выберите пункт:</label>\n" +
-                "      <select class=\"form-control\" id=\"itemSelect\" name=\"item\">\n" +
-                "           <option value=\"1\">“Восьмое чудо света” – город Великий Новгород, улица Новолучанская, дом 3</option>\n" +
-                "           <option value=\"2\">“Наша эпоха” – город Нижневартовск, улица Нефтяников, дом 91</option>\n" +
-                "           <option value=\"3\">“Изобилие цветов” – город Санкт-Петербург, Невский проспект, дом 49</option>\n" +
-                "           <option value=\"4\">“Великодушие Бога” – город Великие Луки, улица Ухтомского, дом 72</option>\n" +
-                "<option value=\"5\">“Дьявольский соблазн” – город Санкт-Петербург, улица Московская, дом 115</option>\n" +
-                "      </select>\n" +
-                "      </div>" +
-                "      <div class=\"form-group\">\n" +
-                "           <label for=\"fileUpload1\" class=\"dropzone\" data-my-value=\"1\" ondragover=\"onDragOver(event)\" ondrop=\"onDrop(event)\">\n" +
-                "               <input id=\"fileUpload1\" type=\"file\" name=\"files\" data-my-value=\"1\" multiple=\"multiple\" style=\"display: none;\" onchange=\"onFileSelect(event)\">\n" +
-                "               <span>Кликните или перетащите файлы сюда для загрузки</span>\n" +
-                "           </label>\n" +
-                "      </div>\n" +
-                "      <button type=\"submit\" id=\"uploadButton\" class=\"btn bg-main text-light\">Сохранить</button>\n";
-    }
-
     public static String searchAndEdit(Long idUser) {
         String searchBar = "<section class=\"search-banner py-5\" id=\"search-banner\">\n" +
                 "    <div class=\"container py-5 my-5\">\n" +
@@ -1167,7 +1137,7 @@ public class MainFunction {
             if (count == 0) {selected += "<option value=\"0\" selected>Без менеджера</option>";} else {selected += "<option value=\"0\">Без менеджера</option>";}
             mainSelected = "       <div class=\"form-group \">\n" +
                     "          <label for=\"FormControl\">Управляющий менеджер</label>\n" +
-                    "                          <select data-id=\""+user.getId()+"\" id=\"inputManagersForm"+user.getId()+"\" class=\"form-control\" >\n" + selected +
+                    "                          <select data-respinput=\"small8resp\" data-id=\""+user.getId()+"\" id=\"inputManagersForm"+user.getId()+"\" class=\"form-control\" >\n" + selected +
                     "                          </select>\n" +
                     "          <small class=\"form-text text-muted\" id=\"small8resp"+user.getId()+"\"></small>"+
                     "                        </div>\n";
@@ -1186,7 +1156,7 @@ public class MainFunction {
                 "       </div>  " +
                 "       <div class=\"form-group\">\n" +
                 "          <label for=\"FormControl\">Почта</label>\n" +
-                "          <input type=\"text\" data-id=\""+user.getId()+"\" id=\"changemail"+user.getId()+"\" class=\"form-control\" value=\"" + user.getMail() + "\" placeholder=\"Почта\">\n" +
+                "          <input type=\"text\" data-respinput=\"small2resp\" data-id=\""+user.getId()+"\" id=\"changemail"+user.getId()+"\" class=\"form-control\" value=\"" + user.getMail() + "\" placeholder=\"Почта\">\n" +
                 "          <small class=\"form-text text-muted\" id=\"small2resp"+user.getId()+"\"></small>"+
                 "       </div>  " +
                 "        <div class=\"form-group\">\n" +
@@ -1196,29 +1166,29 @@ public class MainFunction {
                 "       </div>  " +
                 "        <div class=\"form-group\">\n" +
                 "          <label for=\"FormControl\">Фамилия</label>\n" +
-                "          <input type=\"text\" data-id=\""+user.getId()+"\" id=\"changefname"+user.getId()+"\" class=\"form-control\" value=\"" + user.getFname() + "\" placeholder=\"Фамилия\">\n" +
+                "          <input data-respinput=\"small4resp\" type=\"text\" data-id=\""+user.getId()+"\" id=\"changefname"+user.getId()+"\" class=\"form-control\" value=\"" + user.getFname() + "\" placeholder=\"Фамилия\">\n" +
                 "          <small class=\"form-text text-muted\" id=\"small4resp"+user.getId()+"\"></small>"+
                 "       </div>  " +
                 "        <div class=\"form-group\">\n" +
                 "          <label for=\"FormControl\">Имя</label>\n" +
-                "          <input type=\"text\" data-id=\""+user.getId()+"\" id=\"changeiname"+user.getId()+"\" class=\"form-control\" value=\"" + user.getIname() + "\" placeholder=\"Имя\">\n" +
+                "          <input data-respinput=\"small5resp\" type=\"text\" data-id=\""+user.getId()+"\" id=\"changeiname"+user.getId()+"\" class=\"form-control\" value=\"" + user.getIname() + "\" placeholder=\"Имя\">\n" +
                 "          <small class=\"form-text text-muted\" id=\"small5resp"+user.getId()+"\"></small>"+
                 "       </div>  " +
                 "        <div class=\"form-group\">\n" +
                 "          <label for=\"FormControl\">Отчество</label>\n" +
-                "          <input type=\"text\" data-id=\""+user.getId()+"\" id=\"changeoname"+user.getId()+"\" class=\"form-control\" value=\"" + user.getOname() + "\" placeholder=\"Отчество\">\n" +
+                "          <input data-respinput=\"small6resp\" type=\"text\" data-id=\""+user.getId()+"\" id=\"changeoname"+user.getId()+"\" class=\"form-control\" value=\"" + user.getOname() + "\" placeholder=\"Отчество\">\n" +
                 "          <small class=\"form-text text-muted\" id=\"small6resp"+user.getId()+"\"></small>"+
                 "       </div>  " +
                 "       <div class=\"form-group \">\n" +
                 "          <label for=\"FormControl\">Роль</label>\n" +
-                "                          <select data-id=\""+user.getId()+"\" id=\"inputRoleForm"+user.getId()+"\" class=\"form-control\" >\n" +
+                "                          <select data-respinput=\"small7resp\" data-id=\""+user.getId()+"\" id=\"inputRoleForm"+user.getId()+"\" class=\"form-control\" >\n" +
                 "                            <option " + selected0 + " value=\"0\">Неактивированный</option>\n" +
                 "                            <option " + selected1 + " value=\"1\">Рабочий</option>\n" +
                 "                            <option " + selected2 + " value=\"2\">Менеджер</option>\n" +
                 "                            <option " + selected3 + " value=\"3\">Администратор</option>\n" +
                 "                          </select>\n" +
-                "                        </div>\n" + mainSelected +
                 "      <small class=\"form-text text-muted\" id=\"small7resp"+user.getId()+"\"></small>"+
+                "                        </div>\n" + mainSelected +
                 "      </div>\n" +
                 "    </div>\n" +
                 "  </div>\n" +

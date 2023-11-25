@@ -839,4 +839,35 @@ public class ApiController {
         CardManager.createCard(cardUpdate);
         return true;
     }
+
+    @ResponseBody
+    @PostMapping("/api/savedataadmin")
+    public String onSaveDataAdmin(HttpSession session,@RequestParam(name="iduser", required=false) Long idUser,@RequestParam(name="inputid", required=false) String inputid,@RequestParam(name="value", required=false) String value) {
+        inputid = inputid.replaceAll("\\d", "");
+        User userSave = UserManager.getUserById(idUser).get();
+        switch (inputid) {
+            case "changemail":
+                if (UserManager.getUserByMail(value).orElse(null) != null) {return "Такая почта уже есть";}
+                if (!isValidEmail(value)) {return "Почта невалидна!";}
+                userSave.setMail(value);
+                break;
+            case "changefname":
+                userSave.setFname(value);
+                break;
+            case "changeiname":
+                userSave.setIname(value);
+                break;
+            case "changeoname":
+                userSave.setOname(value);
+                break;
+            case "inputRoleForm":
+                userSave.setUsertype(Integer.parseInt(value));
+                break;
+            case "inputManagersForm":
+                userSave.setIdManager(Long.parseLong(value));
+                break;
+        }
+        userManager.createUser(userSave);
+        return "Сохранено";
+    }
 }
