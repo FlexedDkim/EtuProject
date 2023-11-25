@@ -28,6 +28,12 @@ public class Card {
     @Column(name = "deleted")
     private Boolean deleted;
 
+    @Column(name = "status")
+    private String status;
+
+    @Column(name = "idexecutor")
+    private Long idExecutor;
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -84,6 +90,21 @@ public class Card {
         return description;
     }
 
-}
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
+    public String getStatus() {
+        return status;
+    }
+
+    public void setIdExecutor(Long id) {
+        this.idExecutor = id;
+    }
+
+    public Long getIdExecutor() {
+        return idExecutor;
+    }
+
+}
 
