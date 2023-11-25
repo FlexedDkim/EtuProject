@@ -153,7 +153,7 @@ public class MainFunction {
                 deletedAttribyte = "disabled";
                 deletedAttribyteName = "[Удалено]";
             }
-            if (idOwn == userFunc.getId()) {
+            if (idOwn == file.getIdOwn()) {
                 delBtn = "&nbsp;&nbsp;<button type=\"button\" onclick=\"deleteFile('"+file.getId()+"')\" id=\"btnDeletedFile" + file.getId() + "\" class=\"btn bg-danger text-light\" "+deletedAttribyte+">Удалить</button>";
             }
             filesHtml += "<div id=\"filecard"+file.getId()+"\" style=\"margin-bottom: 10px;\" class=\"card\">\n" +
@@ -187,6 +187,42 @@ public class MainFunction {
                         "    </div>";
         }
         filesHtml += "</div></div>";
+        String status = "";
+        String selectedOpen = "";
+        String selectedInwork = "";
+        String selectedClosed = "";
+        switch (card.getStatus()) {
+            case "open":
+                status = "Открыт";
+                selectedOpen = "selected";
+                break;
+            case "inwork":
+                status = "У работника";
+                selectedInwork = "selected";
+                break;
+            case "close":
+                status = "Закрыт";
+                selectedClosed = "selected";
+                break;
+        }
+        String onchangestatus = "";
+        if (userFunc.getUsertype() == 2) {
+            onchangestatus = "<div class=\"form-group\">\n" +
+                    "          <label for=\"FormControl\">Статус карточки</label>\n" +
+                    "      <select class=\"form-control\" id=\"itemStatusSelect" + card.getId() +"\" onchange=\"onchangestatus('" + card.getId() + "');\" name=\"item\">\n" +
+                    "           <option "+selectedOpen+"value=\"open\">Открыт</option>\n" +
+                    "           <option "+selectedInwork+"value=\"inwork\">У работника</option>\n" +
+                    "           <option "+selectedClosed+" value=\"close\">Закрыт</option>\n" +
+                    "      </select>\n" +
+                    "       </div>  ";
+        }
+        else
+        {
+            onchangestatus = "        <div class=\"form-group\">\n" +
+                    "          <label for=\"FormControl\">Статус</label>\n" +
+                    "          <input type=\"text\" class=\"form-control\" value=\"" + status + "\" placeholder=\"\" disabled>\n" +
+                    "       </div>  ";
+        }
         cardsHtmlBody += "<div class=\"modal fade\" id=\"editcard" + card.getId() + "\" tabindex=\"-1\" aria-labelledby=\"ModalLabel\" aria-hidden=\"true\">\n" +
                     "  <div class=\"modal-dialog modal-dialog-centered\">\n" +
                     "    <div class=\"modal-content\">\n" +
@@ -205,7 +241,8 @@ public class MainFunction {
                     "        <div class=\"form-group\">\n" +
                     "          <label for=\"FormControl\">Автор карточки</label>\n" +
                     "          <input type=\"text\" class=\"form-control\" value=\"" + userFunc.getFname() + " " + userFunc.getIname() + " " + userFunc.getOname() + "\" placeholder=\"\" disabled>\n" +
-                    "       </div>  " +
+                    "       </div>  "
+                    + onchangestatus +
                     "       <label for=\"FormControl\">Прикреплённые файлы</label>\n"
                     + filesHtml +
                     "<div class=\"form-group\">\n" +
@@ -433,7 +470,7 @@ public class MainFunction {
                     deletedAttribyte = "disabled";
                     deletedAttribyteName = "[Удалено]";
                 }
-                if (idOwn == userFunc.getId()) {
+                if (idOwn == file.getIdOwn()) {
                     delBtn = "&nbsp;&nbsp;<button type=\"button\" onclick=\"deleteFile('"+file.getId()+"')\" id=\"btnDeletedFile" + file.getId() + "\" class=\"btn bg-danger text-light\" "+deletedAttribyte+">Удалить</button>";
                 }
                 filesHtml += "<div id=\"filecard"+file.getId()+"\" style=\"margin-bottom: 10px;\" class=\"card\">\n" +
@@ -467,6 +504,18 @@ public class MainFunction {
                                 "    </div>";
             }
             filesHtml += "</div></div>";
+            String status = "";
+            switch (card.getStatus()) {
+                case "open":
+                    status = "Открыт";
+                    break;
+                case "inwork":
+                    status = "У работника";
+                    break;
+                case "close":
+                    status = "Закрыт";
+                    break;
+            }
             cardsHtmlBody += "<div style=\"margin-bottom: 10px;\" class=\"card\">\n" +
                     "            <div class=\"card-body\">\n" +
                     "                <h5 class=\"card-title\">" + card.getName() + "</h5>\n" +
@@ -492,6 +541,10 @@ public class MainFunction {
                     "        <div class=\"form-group\">\n" +
                     "          <label for=\"FormControl\">Автор карточки</label>\n" +
                     "          <input type=\"text\" class=\"form-control\" value=\"" + userFunc.getFname() + " " + userFunc.getIname() + " " + userFunc.getOname() + "\" placeholder=\"\" disabled>\n" +
+                    "       </div>  " +
+                    "        <div class=\"form-group\">\n" +
+                    "          <label for=\"FormControl\">Статус</label>\n" +
+                    "          <input type=\"text\" class=\"form-control\" value=\"" + status + "\" placeholder=\"\" disabled>\n" +
                     "       </div>  " +
                     "       <label for=\"FormControl\">Прикреплённые файлы</label>\n"
                     + filesHtml +
@@ -551,7 +604,7 @@ public class MainFunction {
                     deletedAttribyte = "disabled";
                     deletedAttribyteName = "[Удалено]";
                 }
-                if (idOwn == userCard.getId()) {
+                if (idOwn == file.getIdOwn()) {
                     delBtn = "&nbsp;&nbsp;<button type=\"button\" onclick=\"deleteFile('"+file.getId()+"')\" id=\"btnDeletedFile" + file.getId() + "\" class=\"btn bg-danger text-light\" "+deletedAttribyte+">Удалить</button>";
                 }
                 filesHtml += "<div id=\"filecard"+file.getId()+"\" style=\"margin-bottom: 10px;\" class=\"card\">\n" +
@@ -610,6 +663,14 @@ public class MainFunction {
                     "        <div class=\"form-group\">\n" +
                     "          <label for=\"FormControl\">Автор карточки</label>\n" +
                     "          <input type=\"text\" class=\"form-control\" value=\"" + userCard.getFname() + " " + userCard.getIname() + " " + userCard.getOname() + "\" placeholder=\"\" disabled>\n" +
+                    "       </div>  " +
+                    "        <div class=\"form-group\">\n" +
+                    "          <label for=\"FormControl\">Статус карточки</label>\n" +
+                    "      <select class=\"form-control\" id=\"itemStatusSelect" + card.getId() +"\" onchange=\"onchangestatus('" + card.getId() + "');\" name=\"item\">\n" +
+                    "           <option value=\"open\">Открыт</option>\n" +
+                    "           <option value=\"inwork\">У работника</option>\n" +
+                    "           <option value=\"close\">Закрыт</option>\n" +
+                    "      </select>\n" +
                     "       </div>  " +
                     "       <label for=\"FormControl\">Прикреплённые файлы</label>\n"
                     + filesHtml +
@@ -777,7 +838,7 @@ public class MainFunction {
                 "                    <div style=\"margin-bottom: 0rem;\" class=\"form-group \">\n" +
                 "                          <select id=\"inputStatus\" class=\"form-control\" >\n" +
                 "                            <option value=\"open\" selected>Открыт</option>\n" +
-                "                            <option value=\"inwork\">На проверке</option>\n" +
+                "                            <option value=\"inwork\">На доработке</option>\n" +
                 "                            <option value=\"close\">Закрыт</option>\n" +
                 "                            \n" +
                 "                          </select>\n" +
@@ -839,5 +900,64 @@ public class MainFunction {
                 "</div>\n" +
                 "</section>";
         return searchBar;
+    }
+    public static String getCreateCardManager() {
+        return "<h1 class=\"display-4\">Загрузка файлов</h1>  " +
+                "<div id=\"progressBar\"></div>" +
+                "<div class=\"form-group\">\n" +
+                "    <label for=\"FormControl\">Название</label>\n" +
+                "    <input type=\"text\" class=\"form-control\" id=\"namecard\" placeholder=\"Введите название вашей карточки\">\n" +
+                "  </div>  " +
+                "<div class=\"form-group\">\n" +
+                "    <label for=\"FormControl\">Описание</label>\n" +
+                "    <input type=\"text\" class=\"form-control\" id=\"desccard\" placeholder=\"Введите описание вашей карточки\">\n" +
+                "  </div>" +
+                "      <div class=\"form-group\">\n" +
+                "      <label for=\"itemSelect\">Выберите пункт:</label>\n" +
+                "      <select class=\"form-control\" id=\"itemSelect\" name=\"item\">\n" +
+                "           <option value=\"1\">“Восьмое чудо света” – город Великий Новгород, улица Новолучанская, дом 3</option>\n" +
+                "           <option value=\"2\">“Наша эпоха” – город Нижневартовск, улица Нефтяников, дом 91</option>\n" +
+                "           <option value=\"3\">“Изобилие цветов” – город Санкт-Петербург, Невский проспект, дом 49</option>\n" +
+                "           <option value=\"4\">“Великодушие Бога” – город Великие Луки, улица Ухтомского, дом 72</option>\n" +
+                "<option value=\"5\">“Дьявольский соблазн” – город Санкт-Петербург, улица Московская, дом 115</option>\n" +
+                "      </select>\n" +
+                "      </div>" +
+                "      <div class=\"form-group\">\n" +
+                "           <label for=\"fileUpload1\" class=\"dropzone\" data-my-value=\"1\" ondragover=\"onDragOver(event)\" ondrop=\"onDrop(event)\">\n" +
+                "               <input id=\"fileUpload1\" type=\"file\" name=\"files\" data-my-value=\"1\" multiple=\"multiple\" style=\"display: none;\" onchange=\"onFileSelect(event)\">\n" +
+                "               <span>Кликните или перетащите файлы сюда для загрузки</span>\n" +
+                "           </label>\n" +
+                "      </div>\n" +
+                "      <button type=\"submit\" id=\"uploadButton\" class=\"btn bg-main text-light\">Сохранить</button>\n";
+    }
+
+    public static String getCreateCardUser() {
+        return "<h1 class=\"display-4\">Загрузка файлов</h1>  " +
+                "<div id=\"progressBar\"></div>" +
+                "<div class=\"form-group\">\n" +
+                "    <label for=\"FormControl\">Название</label>\n" +
+                "    <input type=\"text\" class=\"form-control\" id=\"namecard\" placeholder=\"Введите название вашей карточки\">\n" +
+                "  </div>  " +
+                "<div class=\"form-group\">\n" +
+                "    <label for=\"FormControl\">Описание</label>\n" +
+                "    <input type=\"text\" class=\"form-control\" id=\"desccard\" placeholder=\"Введите описание вашей карточки\">\n" +
+                "  </div>" +
+                "      <div class=\"form-group\">\n" +
+                "      <label for=\"itemSelect\">Выберите пункт:</label>\n" +
+                "      <select class=\"form-control\" id=\"itemSelect\" name=\"item\">\n" +
+                "           <option value=\"1\">“Восьмое чудо света” – город Великий Новгород, улица Новолучанская, дом 3</option>\n" +
+                "           <option value=\"2\">“Наша эпоха” – город Нижневартовск, улица Нефтяников, дом 91</option>\n" +
+                "           <option value=\"3\">“Изобилие цветов” – город Санкт-Петербург, Невский проспект, дом 49</option>\n" +
+                "           <option value=\"4\">“Великодушие Бога” – город Великие Луки, улица Ухтомского, дом 72</option>\n" +
+                "<option value=\"5\">“Дьявольский соблазн” – город Санкт-Петербург, улица Московская, дом 115</option>\n" +
+                "      </select>\n" +
+                "      </div>" +
+                "      <div class=\"form-group\">\n" +
+                "           <label for=\"fileUpload1\" class=\"dropzone\" data-my-value=\"1\" ondragover=\"onDragOver(event)\" ondrop=\"onDrop(event)\">\n" +
+                "               <input id=\"fileUpload1\" type=\"file\" name=\"files\" data-my-value=\"1\" multiple=\"multiple\" style=\"display: none;\" onchange=\"onFileSelect(event)\">\n" +
+                "               <span>Кликните или перетащите файлы сюда для загрузки</span>\n" +
+                "           </label>\n" +
+                "      </div>\n" +
+                "      <button type=\"submit\" id=\"uploadButton\" class=\"btn bg-main text-light\">Сохранить</button>\n";
     }
 }

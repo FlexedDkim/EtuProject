@@ -103,6 +103,24 @@ function deleteFile(idfile) {
         }
     });
 }
+
+function onchangestatus(idcard) {
+    let status = $('#itemStatusSelect' + idcard).val();
+    $.ajax({
+        url: "/api/onchangestatus",
+        type: "post",
+        data: {
+            "idcard": idcard,
+            "status": status
+        },
+        error: function () {
+        },
+        beforeSend: function () {
+        },
+        success: function (result) {
+        }
+    });
+}
 $(document).ready(function () {
     $("#uploadButton").on("click", function () {
         var fileInput = $("#fileUpload1")[0];
@@ -289,8 +307,11 @@ $(document).ready(function () {
         let inputObject = $('#inputObject').val();
         let datestart = $('#datestart').val();
         let dateend = $('#dateend').val();
+        let fnameauthorcard = $('#fnameauthorcard').val();
+        let inameauthorcard = $('#inameauthorcard').val();
+        let onameauthorcard = $('#onameauthorcard').val();
         $.ajax({
-            url: "/api/searchengineuser",
+            url: "/api/searchenginemanager",
             type: "post",
             data: {
                 "name":   namecard,
@@ -298,7 +319,10 @@ $(document).ready(function () {
                 "inputstatus": inputStatus,
                 "inputobject": inputObject,
                 "datestart": datestart,
-                "dateend": dateend
+                "dateend": dateend,
+                "fnameauthorcard" : fnameauthorcard,
+                "inameauthorcard" : inameauthorcard,
+                "onameauthorcard" : onameauthorcard,
             },
             error:function(){$("#respsearch").html("Ошибка поиска");},
             beforeSend: function() {

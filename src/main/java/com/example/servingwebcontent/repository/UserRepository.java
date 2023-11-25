@@ -8,4 +8,6 @@ import java.util.*;
 public interface UserRepository extends JpaRepository<User, Long>  {
     Optional<User> findByMail(String mail);
     Optional<User> findById(Long id);
+
+    Optional<User> findAllByInameContainingIgnoreCaseAndFnameContainingIgnoreCaseAndOnameContainingIgnoreCaseAndId(String iname, String fname, String oname, Long id);
 }

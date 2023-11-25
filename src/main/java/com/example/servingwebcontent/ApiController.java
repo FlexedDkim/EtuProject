@@ -686,4 +686,83 @@ public class ApiController {
         return response;
     }
 
+    @ResponseBody
+    @PostMapping("/api/searchenginemanager")
+    public Object SearchEngineManager(HttpSession session,@RequestParam(name="name", required=false) String name,@RequestParam(name="description", required=false) String description,@RequestParam(name="inputstatus", required=false) String status,@RequestParam(name="inputobject", required=false) Long object,@RequestParam(name="datestart", required=false) String datestart,@RequestParam(name="dateend", required=false) String dateend,@RequestParam(name="fnameauthorcard", required=false) String fnameauthorcard,@RequestParam(name="inameauthorcard", required=false) String inameauthorcard,@RequestParam(name="onameauthorcard", required=false) String onameauthorcard) {
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        class SearchResponse {
+            @JsonProperty("status")
+            private String status;
+            @JsonProperty("messageup")
+            private String messageUp;
+            @JsonProperty("messagedown")
+            private String messageDown;
+
+            public void setStatus(String status) {
+                this.status = status;
+            }
+
+            public void setMessageUp(String message) {
+                this.messageUp = message;
+            }
+
+            public void setMessageDown(String message) {
+                this.messageDown = message;
+            }
+
+        }
+        List<Card> cards = CardManager.readAllByNameIgnoreCase(name.describeConstable(),description.describeConstable(),status.describeConstable(),object);
+        String resp = "<table class=\"table\">\n" +
+                "  <thead>\n" +
+                "    <tr>\n" +
+                "      <th scope=\"col\">#</th>\n" +
+                "      <th scope=\"col\">Название</th>\n" +
+                "      <th scope=\"col\">Описание</th>\n" +
+                "      <th scope=\"col\">Редактирование</th>\n" +
+                "    </tr>\n" +
+                "  </thead>\n" +
+                "  <tbody>";
+        String respmodal = "";
+        int counter = 0;
+        String mail = (String) session.getAttribute("user");
+        User searchUser = userManager.getUserByMail(mail).get();
+        for (Card card : cards) {
+            if (getBetwheenDates(datestart,dateend,card.getTime()) && userManager.searchUser(inameauthorcard,fnameauthorcard,onameauthorcard,searchUser.getId()).isPresent()) {
+                counter++;
+                resp += "<tr>\n" +
+                        "      <th scope=\"row\">"+counter+"</th>\n" +
+                        "      <td>"+card.getName()+"</td>\n" +
+                        "      <td>"+card.getDescription()+"</td>\n" +
+                        "      <td><button type=\"button\" id=\"editcardbtn"+card.getId()+"\" data-toggle=\"modal\" data-target=\"#editcard" + card.getId() + "\" class=\"btn bg-main text-light\">Посмотреть</button></td>\n" +
+                        "    </tr>";
+                respmodal+=getCardsUser(card,searchUser.getId());
+            }
+        }
+        if (counter == 0) {
+            resp = "Ничего не найдено!";
+        } else {
+            resp+= "</tbody>\n" +
+                    "</table>" + respmodal;
+        }
+
+        SearchResponse response = new SearchResponse();
+        response.setStatus("success");
+        response.setMessageUp("Результатов найдено: " + counter);
+        response.setMessageDown(resp);
+
+        return response;
+    }
+
+    @ResponseBody
+    @PostMapping("/api/onchangestatus")
+    public Boolean onChangeStatus(HttpSession session,@RequestParam(name="status", required=false) String status,@RequestParam(name="idcard", required=false) Long idcard) {
+        if (!((status.equals("open") || status.equals("inwork") || status.equals("close")))) {return false;}
+        if (CardManager.readAllById(idcard).isEmpty()) {return false;}
+        if (UserManager.getUserByMail((String) session.getAttribute("user")).get().getUsertype() != 2) {return false;}
+
+        Card cardUpdate = CardManager.readAllById(idcard).get();
+        cardUpdate.setStatus(status);
+        CardManager.createCard(cardUpdate);
+        return true;
+    }
 }

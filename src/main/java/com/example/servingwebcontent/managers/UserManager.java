@@ -31,4 +31,5 @@ public class UserManager {
     public static Optional<User> getUserById(Long id) {
         return userRepository.findById(id);
     }
+    public static Optional<User> searchUser(String iname, String fname, String oname, Long id) {return userRepository.findAllByInameContainingIgnoreCaseAndFnameContainingIgnoreCaseAndOnameContainingIgnoreCaseAndId(iname,fname,oname,id); }
 }
