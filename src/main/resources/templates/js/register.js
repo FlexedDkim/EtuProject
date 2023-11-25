@@ -3,7 +3,7 @@ $(document).ready(function(){
         let mail   = $('#mail').val();
         let pass = $('#pass').val();
         let captchainput = $('#captchainput').val();
-        let passrepeat = $('#passrepeat').val();
+        let pass_repeat = $('#pass_repeat').val();
         $.ajax({
             url: "api/register",
             type: "post",
@@ -11,7 +11,7 @@ $(document).ready(function(){
                 "mail":   mail,
                 "pass":   pass,
                 "captcha":   captchainput,
-                "passrepeat":   passrepeat
+                "pass_repeat":   pass_repeat
             },
             error:function(){$("#erconts").html("Ошибка регистрации!");},
             beforeSend: function() {

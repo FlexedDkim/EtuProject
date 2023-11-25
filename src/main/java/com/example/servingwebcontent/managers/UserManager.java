@@ -28,18 +28,7 @@ public class UserManager {
         return userRepository.findByMail(mail);
     }
 
-    public static List<User> getUsertype(Long id) {
-        return userRepository.findByUsertype(id);
-    }
-
     public static Optional<User> getUserById(Long id) {
         return userRepository.findById(id);
     }
-
-    public static List<User> getUserByIdManager(Long id) {
-        return userRepository.findByIdManager(id);
-    }
-
-    public static Optional<User> searchUser(String iname, String fname, String oname, Long id) {return userRepository.findAllByInameContainingIgnoreCaseAndFnameContainingIgnoreCaseAndOnameContainingIgnoreCaseAndId(iname,fname,oname,id); }
-    public static List<User> searchadmin(Optional<String> iname, Optional<String> fname, Optional<String> oname, Optional<String> mail,Long usertype) {return userRepository.findAllByInameContainingIgnoreCaseAndFnameContainingIgnoreCaseAndOnameContainingIgnoreCaseAndMailContainingIgnoreCaseAndUsertype(iname, fname, oname, mail,usertype);}
 }
