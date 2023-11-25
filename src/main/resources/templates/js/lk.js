@@ -148,6 +148,16 @@ $(document).ready(function () {
         var descCard = $("#desccard").val();
         formData.append("desccard", descCard);
 
+        if (document.getElementById('itemSelectEmployer')) {
+            var itemSelectEmployer = $("#itemSelectEmployer").val();
+            formData.append("itemSelectEmployer", itemSelectEmployer);
+        }
+        else
+        {
+            var itemSelectEmployer = $("#itemSelectEmployer").val();
+            formData.append("itemSelectEmployer", 0);
+        }
+
         $.ajax({
             url: "/api/uploadfiles",
             type: "POST",
@@ -356,4 +366,74 @@ $(document).ready(function () {
             }
         });
     });
+
+    $("#searchstartforadmin").on("click", function () {
+        let inputRole = $('#inputRole').val();
+        let datestart = $('#datestart').val();
+        let dateend = $('#dateend').val();
+        let fname = $('#fname').val();
+        let iname = $('#iname').val();
+        let oname= $('#oname').val();
+        let mail= $('#mail').val();
+        $.ajax({
+            url: "/api/searchengineadmin",
+            type: "post",
+            data: {
+                "inputrole": inputRole,
+                "datestart": datestart,
+                "dateend": dateend,
+                "fname" : fname,
+                "iname" : iname,
+                "oname" : oname,
+                "mail" : mail
+            },
+            error:function(){$("#respsearch").html("Ошибка поиска");},
+            beforeSend: function() {
+                $("#respsearch").html("Поиск...");
+            },
+            success: function(result){
+                $("#respsearch").html(result.messageup);
+                $("#respsearchbottom").html(result.messagedown);
+                const inputs = document.querySelectorAll('input, select');
+                inputs.forEach(setupInput);
+            }
+        });
+    });
 });
+
+function saveData(inputId, value,id) {
+    $.ajax({
+        url: "/api/savedataadmin",
+        type: "post",
+        data: {
+            "iduser":   id,
+            "inputid": inputId,
+            "value": value,
+        },
+        error:function(){$("#" +inputId + id).html("Ошибка сохранения значения");},
+        beforeSend: function() {
+            $("#" +inputId + id).html("Сохранение...");
+        },
+        success: function(result){
+            $("#" +inputId + id).html(result);
+        }
+    });
+}
+
+function setupInput(input) {
+    let timeoutId = null;
+
+    input.addEventListener('input', function (event) {
+        const inputId = event.target.id;
+        const value = event.target.value;
+        const dataid = event.target.getAttribute('data-id');
+        if (dataid) {
+            if (timeoutId) {
+                clearTimeout(timeoutId);
+            }
+            timeoutId = setTimeout(() => {
+                saveData(inputId, value, dataid);
+            }, 1000);
+        }
+    });
+}

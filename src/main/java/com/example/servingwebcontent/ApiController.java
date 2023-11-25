@@ -356,8 +356,9 @@ public class ApiController {
     public class FileUploadController {
         private static final String UPLOAD_DIR = "src/main/resources/uploads/";
         @PostMapping
-        public String handleFileUpload(@RequestParam(name="desccard") String descCard,@RequestParam(name="namecard") String nameCard, @RequestParam("selectObject") Long selectObject,@RequestParam("files") List<MultipartFile> files,HttpSession session) {
+        public String handleFileUpload(@RequestParam(name="desccard") String descCard,@RequestParam(name="namecard") String nameCard, @RequestParam("selectObject") Long selectObject,@RequestParam("files") List<MultipartFile> files,HttpSession session, @RequestParam("itemSelectEmployer") Long itemSelectEmployer) {
             try {
+                if (itemSelectEmployer == null) {itemSelectEmployer = 0l;}
                 if (descCard.isEmpty() || nameCard.isEmpty()) {return "Заполните все поля!";}
                 if (nameCard.length() > 30 || descCard.length() > 100) {return "Поле Имя карточки может содержать до 30 символов. Описание - до 100.";}
                 for (MultipartFile file : files) {
@@ -366,7 +367,7 @@ public class ApiController {
                 }
                 String mail = (String) session.getAttribute("user");
                 Long idUser = userManager.getUserByMail(mail).get().getId();
-                Long idCard = createCard(selectObject,idUser,nameCard,descCard);
+                Long idCard = createCard(selectObject,idUser,nameCard,descCard,itemSelectEmployer);
                 for (MultipartFile file : files) {
                     saveFile(file,idCard,idUser);
                 }
@@ -408,7 +409,7 @@ public class ApiController {
             return "ok";
         }
 
-        private Long createCard(Long selectObject, Long idOwn, String nameCard, String descCard) {
+        private Long createCard(Long selectObject, Long idOwn, String nameCard, String descCard,Long itemSelectEmployer) {
             Card newCard = new Card();
             newCard.setName(nameCard);
             newCard.setTime(getCurrentTime());
@@ -417,7 +418,7 @@ public class ApiController {
             newCard.setIdOwn(idOwn);
             newCard.setDescription(descCard);
             newCard.setStatus("open");
-            newCard.setIdExecutor(idOwn);
+            if (userManager.getUserById(idOwn).get().getUsertype() != 2) {newCard.setIdExecutor(idOwn);} else {newCard.setIdExecutor(itemSelectEmployer);}
             CardManager.createCard(newCard);
             return CardManager.createCard(newCard).getId();
         }
@@ -738,6 +739,77 @@ public class ApiController {
                         "      <td><button type=\"button\" id=\"editcardbtn"+card.getId()+"\" data-toggle=\"modal\" data-target=\"#editcard" + card.getId() + "\" class=\"btn bg-main text-light\">Посмотреть</button></td>\n" +
                         "    </tr>";
                 respmodal+=getCardsUser(card,searchUser.getId());
+            }
+        }
+        if (counter == 0) {
+            resp = "Ничего не найдено!";
+        } else {
+            resp+= "</tbody>\n" +
+                    "</table>" + respmodal;
+        }
+
+        SearchResponse response = new SearchResponse();
+        response.setStatus("success");
+        response.setMessageUp("Результатов найдено: " + counter);
+        response.setMessageDown(resp);
+
+        return response;
+    }
+
+    @ResponseBody
+    @PostMapping("/api/searchengineadmin")
+    public Object SearchEngineAdmin(HttpSession session,@RequestParam(name="mail", required=false) String mail,@RequestParam(name="inputrole", required=false) Long inputRole,@RequestParam(name="datestart", required=false) String datestart,@RequestParam(name="dateend", required=false) String dateend,@RequestParam(name="fname", required=false) String fname,@RequestParam(name="iname", required=false) String iname,@RequestParam(name="oname", required=false) String oname) {
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        class SearchResponse {
+            @JsonProperty("status")
+            private String status;
+            @JsonProperty("messageup")
+            private String messageUp;
+            @JsonProperty("messagedown")
+            private String messageDown;
+
+            public void setStatus(String status) {
+                this.status = status;
+            }
+
+            public void setMessageUp(String message) {
+                this.messageUp = message;
+            }
+
+            public void setMessageDown(String message) {
+                this.messageDown = message;
+            }
+
+        }
+        List<User> users = UserManager.searchadmin(iname.describeConstable(),fname.describeConstable(),oname.describeConstable(),mail.describeConstable(),inputRole);
+        String resp = "<table class=\"table\">\n" +
+                "  <thead>\n" +
+                "    <tr>\n" +
+                "      <th scope=\"col\">#</th>\n" +
+                "      <th scope=\"col\">Фамилия</th>\n" +
+                "      <th scope=\"col\">Имя</th>\n" +
+                "      <th scope=\"col\">Отчество</th>\n" +
+                "      <th scope=\"col\">Почта</th>\n" +
+                "      <th scope=\"col\">Дата регистрации</th>\n" +
+                "      <th scope=\"col\">Подробнее</th>\n" +
+                "    </tr>\n" +
+                "  </thead>\n" +
+                "  <tbody>";
+        String respmodal = "";
+        int counter = 0;
+        for (User user : users) {
+            if (getBetwheenDates(datestart,dateend,user.getTime())) {
+                counter++;
+                resp += "<tr>\n" +
+                        "      <th scope=\"row\">"+counter+"</th>\n" +
+                        "      <td>"+user.getFname()+"</td>\n" +
+                        "      <td>"+user.getIname()+"</td>\n" +
+                        "      <td>"+user.getOname()+"</td>\n" +
+                        "      <td>"+user.getMail()+"</td>\n" +
+                        "      <td>"+getInNormalDate(user.getTime())+"</td>\n" +
+                        "      <td><button type=\"button\" id=\"editcardbtn"+user.getId()+"\" data-toggle=\"modal\" data-target=\"#cardmodal" + user.getId() + "\" class=\"btn bg-main text-light\">Посмотреть</button></td>\n" +
+                        "    </tr>";
+                respmodal+=getCardsUserModel(user);
             }
         }
         if (counter == 0) {

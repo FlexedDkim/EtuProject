@@ -1,5 +1,6 @@
 package com.example.servingwebcontent.func;
 
+import ch.qos.logback.core.model.Model;
 import com.example.servingwebcontent.database.Card;
 import com.example.servingwebcontent.database.Comment;
 import com.example.servingwebcontent.database.File;
@@ -9,6 +10,7 @@ import com.example.servingwebcontent.managers.CommentManager;
 import com.example.servingwebcontent.managers.FileManager;
 import com.example.servingwebcontent.managers.UserManager;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.websocket.Session;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -142,7 +144,8 @@ public class MainFunction {
         UserManager userManager = null;
         Optional<User> userOptional = userManager.getUserById(idOwn);
         User userFunc = userOptional.get();
-        User userCard = userManager.getUserById(card.getIdExecutor()).get();
+        User userCardEx = userManager.getUserById(card.getIdExecutor()).get();
+        User userCard = userManager.getUserById(card.getIdOwn()).get();
         String cardsHtmlBody = "";
         String filesHtml = "<div id=\"filecontainer"+card.getId()+"\" class=\"container\"><div class=\"card-deck\">";
         List<File> files = FileManager.readAllByIdCard(card.getId());
@@ -241,11 +244,11 @@ public class MainFunction {
                     "       </div>  " +
                     "        <div class=\"form-group\">\n" +
                     "          <label for=\"FormControl\">Автор карточки</label>\n" +
-                    "          <input type=\"text\" class=\"form-control\" value=\"" + userFunc.getFname() + " " + userFunc.getIname() + " " + userFunc.getOname() + "\" placeholder=\"\" disabled>\n" +
+                    "          <input type=\"text\" class=\"form-control\" value=\"" + userCard.getFname() + " " + userCard.getIname() + " " + userCard.getOname() + "\" placeholder=\"\" disabled>\n" +
                     "       </div>  " +
                     "        <div class=\"form-group\">\n" +
                             "          <label for=\"FormControl\">Исполнитель</label>\n" +
-                    "          <input type=\"text\" class=\"form-control\" value=\"" + userCard.getFname() + " " + userCard.getIname() + " " + userCard.getOname() + "\" placeholder=\"\" disabled>\n" +
+                    "          <input type=\"text\" class=\"form-control\" value=\"" + userCardEx.getFname() + " " + userCardEx.getIname() + " " + userCardEx.getOname() + "\" placeholder=\"\" disabled>\n" +
                     "       </div>  "
                     + onchangestatus +
                     "       <label for=\"FormControl\">Прикреплённые файлы</label>\n"
@@ -465,7 +468,8 @@ public class MainFunction {
         String cardsHtmlBody = "";
         String cardsHtml = "<div class=\"container\"><div class=\"card-deck\">";
         for (Card card : cards) {
-            User userCard = userManager.getUserById(card.getIdExecutor()).get();
+            User userCardEx = userManager.getUserById(card.getIdExecutor()).get();
+            User userCard = userManager.getUserById(card.getIdOwn()).get();
             String filesHtml = "<div id=\"filecontainer"+card.getId()+"\" class=\"container\"><div class=\"card-deck\">";
             List<File> files = FileManager.readAllByIdCard(card.getId());
             for (File file : files) {
@@ -546,11 +550,11 @@ public class MainFunction {
                     "       </div>  " +
                     "        <div class=\"form-group\">\n" +
                     "          <label for=\"FormControl\">Автор карточки</label>\n" +
-                    "          <input type=\"text\" class=\"form-control\" value=\"" + userFunc.getFname() + " " + userFunc.getIname() + " " + userFunc.getOname() + "\" placeholder=\"\" disabled>\n" +
+                    "          <input type=\"text\" class=\"form-control\" value=\"" + userCard.getFname() + " " + userCard.getIname() + " " + userCard.getOname() + "\" placeholder=\"\" disabled>\n" +
                     "       </div>  " +
                     "        <div class=\"form-group\">\n" +
                     "          <label for=\"FormControl\">Исполнитель</label>\n" +
-                    "          <input type=\"text\" class=\"form-control\" value=\"" + userCard.getFname() + " " + userCard.getIname() + " " + userCard.getOname() + "\" placeholder=\"\" disabled>\n" +
+                    "          <input type=\"text\" class=\"form-control\" value=\"" + userCardEx.getFname() + " " + userCardEx.getIname() + " " + userCardEx.getOname() + "\" placeholder=\"\" disabled>\n" +
                     "       </div>  " +
                     "        <div class=\"form-group\">\n" +
                     "          <label for=\"FormControl\">Статус</label>\n" +
@@ -954,6 +958,12 @@ public class MainFunction {
         return searchBar;
     }
     public static String getCreateCardManager(Long idUser) {
+        String selected = "";
+        List<User> users = UserManager.getUserByIdManager(idUser);
+
+        for (User user : users) {
+            selected+="<option value=\""+user.getId()+"\">"+ user.getFname()+" " +user.getIname()+ " " +user.getOname()+ " ("+user.getMail()+")</option>";
+        }
         return "<h1 class=\"display-4\">Создание карточки</h1>  " +
                 "<div id=\"progressBar\"></div>" +
                 "<div class=\"form-group\">\n" +
@@ -972,6 +982,12 @@ public class MainFunction {
                 "           <option value=\"3\">“Изобилие цветов” – город Санкт-Петербург, Невский проспект, дом 49</option>\n" +
                 "           <option value=\"4\">“Великодушие Бога” – город Великие Луки, улица Ухтомского, дом 72</option>\n" +
                 "<option value=\"5\">“Дьявольский соблазн” – город Санкт-Петербург, улица Московская, дом 115</option>\n" +
+                "      </select>\n" +
+                "      </div>" +
+                "      <div class=\"form-group\">\n" +
+                "      <label for=\"itemSelect\">Выберите исполнителя:</label>\n" +
+                "      <select class=\"form-control\" id=\"itemSelectEmployer\" name=\"item\">\n" +
+                selected +
                 "      </select>\n" +
                 "      </div>" +
                 "      <div class=\"form-group\">\n" +
@@ -1011,5 +1027,202 @@ public class MainFunction {
                 "           </label>\n" +
                 "      </div>\n" +
                 "      <button type=\"submit\" id=\"uploadButton\" class=\"btn bg-main text-light\">Сохранить</button>\n";
+    }
+
+    public static String createNew(Long idUser) {
+        return "<h1 class=\"display-4\">Добавление и редактирование</h1>  " +
+                "<div id=\"progressBar\"></div>" +
+                "<div class=\"form-group\">\n" +
+                "    <label for=\"FormControl\">Название</label>\n" +
+                "    <input type=\"text\" class=\"form-control\" id=\"namecard\" placeholder=\"Введите название вашей карточки\">\n" +
+                "  </div>  " +
+                "<div class=\"form-group\">\n" +
+                "    <label for=\"FormControl\">Описание</label>\n" +
+                "    <input type=\"text\" class=\"form-control\" id=\"desccard\" placeholder=\"Введите описание вашей карточки\">\n" +
+                "  </div>" +
+                "      <div class=\"form-group\">\n" +
+                "      <label for=\"itemSelect\">Выберите пункт:</label>\n" +
+                "      <select class=\"form-control\" id=\"itemSelect\" name=\"item\">\n" +
+                "           <option value=\"1\">“Восьмое чудо света” – город Великий Новгород, улица Новолучанская, дом 3</option>\n" +
+                "           <option value=\"2\">“Наша эпоха” – город Нижневартовск, улица Нефтяников, дом 91</option>\n" +
+                "           <option value=\"3\">“Изобилие цветов” – город Санкт-Петербург, Невский проспект, дом 49</option>\n" +
+                "           <option value=\"4\">“Великодушие Бога” – город Великие Луки, улица Ухтомского, дом 72</option>\n" +
+                "<option value=\"5\">“Дьявольский соблазн” – город Санкт-Петербург, улица Московская, дом 115</option>\n" +
+                "      </select>\n" +
+                "      </div>" +
+                "      <div class=\"form-group\">\n" +
+                "           <label for=\"fileUpload1\" class=\"dropzone\" data-my-value=\"1\" ondragover=\"onDragOver(event)\" ondrop=\"onDrop(event)\">\n" +
+                "               <input id=\"fileUpload1\" type=\"file\" name=\"files\" data-my-value=\"1\" multiple=\"multiple\" style=\"display: none;\" onchange=\"onFileSelect(event)\">\n" +
+                "               <span>Кликните или перетащите файлы сюда для загрузки</span>\n" +
+                "           </label>\n" +
+                "      </div>\n" +
+                "      <button type=\"submit\" id=\"uploadButton\" class=\"btn bg-main text-light\">Сохранить</button>\n";
+    }
+
+    public static String searchAndEdit(Long idUser) {
+        String searchBar = "<section class=\"search-banner py-5\" id=\"search-banner\">\n" +
+                "    <div class=\"container py-5 my-5\">\n" +
+                "    <div class=\"row text-dark text-center pb-4\">\n" +
+                "        <div class=\"col-md-12\">\n" +
+                "            <h2 id=\"respsearch\">Поиск</h2>\n" +
+                "        </div>\n" +
+                "    </div>   \n" +
+                "    <div class=\"row\">\n" +
+                "        <div class=\"col-md-12\">\n" +
+                "            <div class=\"card\">\n" +
+                "                <div class=\"card-body\">\n" +
+                "                    <div class=\"row\">\n" +
+                "                <div class=\"col\">\n" +
+                "                    <div style=\"margin-bottom: 0rem;\" class=\"form-group \">\n" +
+                " <input class=\"form-control\" type=\"date\" id=\"datestart\" placeholder=\"Поиск с\" aria-label=\"Start date\">" +
+                " <small class=\"form-text text-muted\">Дата регистрации, с которой будет производиться поиск</small>" +
+                "                        </div>\n" +
+                "                </div>\n" +
+                "                <div class=\"col\">\n" +
+                "                    <div style=\"margin-bottom: 0rem;\" class=\"form-group \">\n" +
+                " <input class=\"form-control\" type=\"date\" id=\"dateend\" placeholder=\"Поиск до\" aria-label=\"End date\">" +
+                " <small class=\"form-text text-muted\">Дата регистрации, до которой будет производиться поиск (Не включительно)</small>" +
+                "                        </div>\n" +
+                "                </div>\n" +
+                "                <div class=\"col\">\n" +
+                "                    <div class=\"form-group \">\n" +
+                " <input class=\"form-control\" id=\"mail\" type=\"text\" placeholder=\"Почта пользователя\">" +
+                "                        </div>\n" +
+                "                </div>\n" +
+                "            </div>\n" +
+
+                "<div class=\"row\">\n" +
+                "                <div class=\"col\">\n" +
+                "                    <div class=\"form-group \">\n" +
+                " <input class=\"form-control\" id=\"fname\" type=\"text\" placeholder=\"Фамилия пользователя\">" +
+                "                        </div>\n" +
+                "                </div>\n" +
+                "                <div class=\"col\">\n" +
+                "                    <div class=\"form-group \">\n" +
+                " <input class=\"form-control\" id=\"iname\" type=\"text\" placeholder=\"Имя пользователя\">" +
+                "                        </div>\n" +
+                "                </div>\n" +
+                "                <div class=\"col\">\n" +
+                "                    <div class=\"form-group \">\n" +
+                " <input class=\"form-control\" id=\"oname\" type=\"text\" placeholder=\"Отчество пользователя\">" +
+                "                        </div>\n" +
+                "                </div>\n" +
+                "               <div class=\"col\">\n" +
+                "                    <div style=\"margin-bottom: 0rem;\" class=\"form-group \">\n" +
+                "                          <select id=\"inputRole\" class=\"form-control\" >\n" +
+                "                            <option value=\"0\" selected>Неактивированный</option>\n" +
+                "                            <option value=\"1\">Рабочий</option>\n" +
+                "                            <option value=\"2\">Менеджер</option>\n" +
+                "                            <option value=\"3\">Администратор</option>\n" +
+                "                          </select>\n" +
+                " <small class=\"form-text text-muted\">Роль</small>" +
+                "                        </div>\n" +
+                "                </div>\n" +
+                "                <div class=\"col\">\n" +
+                "                    <button type=\"button\" id=\"searchstartforadmin\" class=\"btn bg-main text-light\">Найти!</button>\n" +
+                "                </div>\n" +
+                "            </div>\n" +
+
+                "                </div>\n" +
+                "            </div>\n" +
+                "            \n" +
+                "        </div>\n" +
+                "    </div>\n" +
+                "<div id=\"respsearchbottom\"></div>" +
+                "</div>\n" +
+                "</section>";
+        return searchBar;
+    }
+
+    public static String getCardsUserModel(User user) {
+        String selected0 = "";
+        String selected1 = "";
+        String selected2 = "";
+        String selected3 = "";
+        switch (user.getUsertype()) {
+            case 0:
+                selected0 = "selected";
+                break;
+            case 1:
+                selected1 = "selected";
+                break;
+            case 2:
+                selected2 = "selected";
+                break;
+            case 3:
+                selected3 = "selected";
+                break;
+        }
+
+        List<User> ManagersUsers = UserManager.getUsertype(2L);
+        String mainSelected = "";
+        String selected = "";
+        int count = 0;
+        if (user.getUsertype() == 1 || user.getUsertype() == 0) {
+            for (User userM : ManagersUsers) {
+                String selectedManager = "";
+                if (userM.getId() == user.getIdManager()) {selectedManager = "selected";count++;}
+                    selected += "<option "+selectedManager+" value=\"" + userM.getId() + "\">" + userM.getFname() + " " + userM.getIname() + " " + userM.getOname() + " (" + userM.getMail() + ")</option>";
+            }
+            if (count == 0) {selected += "<option value=\"0\" selected>Без менеджера</option>";} else {selected += "<option value=\"0\">Без менеджера</option>";}
+            mainSelected = "       <div class=\"form-group \">\n" +
+                    "          <label for=\"FormControl\">Управляющий менеджер</label>\n" +
+                    "                          <select data-id=\""+user.getId()+"\" id=\"inputManagersForm"+user.getId()+"\" class=\"form-control\" >\n" + selected +
+                    "                          </select>\n" +
+                    "          <small class=\"form-text text-muted\" id=\"small8resp"+user.getId()+"\"></small>"+
+                    "                        </div>\n";
+        }
+        String returnBack = "<div class=\"modal fade\" id=\"cardmodal" + user.getId() + "\" tabindex=\"-1\" aria-labelledby=\"ModalLabel\" aria-hidden=\"true\">\n" +
+                "  <div class=\"modal-dialog modal-dialog-centered\">\n" +
+                "    <div class=\"modal-content\">\n" +
+                "      <div class=\"modal-header\">\n" +
+                "        <h4 class=\"modal-title fs-5\">Карточка пользователя</h4>\n" +
+                "      </div>\n" +
+                "      <div class=\"modal-body\">\n" +
+                "       <div class=\"form-group\">\n" +
+                "          <label for=\"FormControl\">ID</label>\n" +
+                "          <input type=\"text\" class=\"form-control\" value=\"" + user.getId() + "\" placeholder=\"\" disabled>\n" +
+                "          <small class=\"form-text text-muted\" id=\"small1resp"+user.getId()+"\"></small>"+
+                "       </div>  " +
+                "       <div class=\"form-group\">\n" +
+                "          <label for=\"FormControl\">Почта</label>\n" +
+                "          <input type=\"text\" data-id=\""+user.getId()+"\" id=\"changemail"+user.getId()+"\" class=\"form-control\" value=\"" + user.getMail() + "\" placeholder=\"Почта\">\n" +
+                "          <small class=\"form-text text-muted\" id=\"small2resp"+user.getId()+"\"></small>"+
+                "       </div>  " +
+                "        <div class=\"form-group\">\n" +
+                "          <label for=\"FormControl\">Время регистрации</label>\n" +
+                "          <input type=\"text\" class=\"form-control\" value=\"" + getInNormalDate(user.getTime()) + "\" placeholder=\"\" disabled>\n" +
+                "          <small class=\"form-text text-muted\" id=\"small3resp"+user.getId()+"\"></small>"+
+                "       </div>  " +
+                "        <div class=\"form-group\">\n" +
+                "          <label for=\"FormControl\">Фамилия</label>\n" +
+                "          <input type=\"text\" data-id=\""+user.getId()+"\" id=\"changefname"+user.getId()+"\" class=\"form-control\" value=\"" + user.getFname() + "\" placeholder=\"Фамилия\">\n" +
+                "          <small class=\"form-text text-muted\" id=\"small4resp"+user.getId()+"\"></small>"+
+                "       </div>  " +
+                "        <div class=\"form-group\">\n" +
+                "          <label for=\"FormControl\">Имя</label>\n" +
+                "          <input type=\"text\" data-id=\""+user.getId()+"\" id=\"changeiname"+user.getId()+"\" class=\"form-control\" value=\"" + user.getIname() + "\" placeholder=\"Имя\">\n" +
+                "          <small class=\"form-text text-muted\" id=\"small5resp"+user.getId()+"\"></small>"+
+                "       </div>  " +
+                "        <div class=\"form-group\">\n" +
+                "          <label for=\"FormControl\">Отчество</label>\n" +
+                "          <input type=\"text\" data-id=\""+user.getId()+"\" id=\"changeoname"+user.getId()+"\" class=\"form-control\" value=\"" + user.getOname() + "\" placeholder=\"Отчество\">\n" +
+                "          <small class=\"form-text text-muted\" id=\"small6resp"+user.getId()+"\"></small>"+
+                "       </div>  " +
+                "       <div class=\"form-group \">\n" +
+                "          <label for=\"FormControl\">Роль</label>\n" +
+                "                          <select data-id=\""+user.getId()+"\" id=\"inputRoleForm"+user.getId()+"\" class=\"form-control\" >\n" +
+                "                            <option " + selected0 + " value=\"0\">Неактивированный</option>\n" +
+                "                            <option " + selected1 + " value=\"1\">Рабочий</option>\n" +
+                "                            <option " + selected2 + " value=\"2\">Менеджер</option>\n" +
+                "                            <option " + selected3 + " value=\"3\">Администратор</option>\n" +
+                "                          </select>\n" +
+                "                        </div>\n" + mainSelected +
+                "      <small class=\"form-text text-muted\" id=\"small7resp"+user.getId()+"\"></small>"+
+                "      </div>\n" +
+                "    </div>\n" +
+                "  </div>\n" +
+                "</div>";
+        return returnBack;
     }
 }
