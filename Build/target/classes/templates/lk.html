@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <link href="../img/favicon.jpeg" rel="icon">
+    <title>Личный кабинет</title>
+</head>
+<body>
+<h1 th:text="'Привет, ' + ${user} + '!'"></h1>
+<a href="../api/logout">Выйти</a>
+</body>
+</html>

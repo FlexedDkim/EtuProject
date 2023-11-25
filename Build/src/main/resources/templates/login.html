@@ -1,0 +1,27 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=0.75, user-scalable=no">
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/relogin.css">
+    <link href="img/favicon.jpeg" rel="icon">
+    <title>Авторизация</title>
+</head>
+<body>
+<div class="form form-login animated bounceIn">
+    <center><h2>Авторизация</h2></center>
+    <center><div id="erconts"></div></center>
+    <form id="form-reg">
+        <input name="mail" id="mail" placeholder="Почта" type="text" required="">
+        <input name="pass" id="pass" placeholder="Пароль" type="password" required="">
+        <br><input type="button" class="animated infinite pulse" value="Войти" id="btn_submit">
+    </form>
+    <center><h3>Нет аккаунта? <a href="register">Зарегистрируйтесь!</a></h3></center>
+</div>
+</body>
+
+<script src="js/jquery.js"></script>
+<script src="js/login.js"></script>
+<script src="js/enterbuttonform.js"></script>
+
+</html>
