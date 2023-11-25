@@ -85,6 +85,15 @@ body {
     width: 350px;
     background-color: #FF8C00;
     border-radius: 10px;
+    position: relative;
+    left: 50px;
+}
+.second-resp {
+    width: 350px;
+    background-color: #6c757d;
+    border-radius: 10px;
+    position: relative;
+    right: 50px;
 }
 .text2{
     font-size: 13px;
