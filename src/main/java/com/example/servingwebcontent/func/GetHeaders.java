@@ -89,7 +89,7 @@ public class GetHeaders {
                         break;
                     case "view": response = getSearchBarManagerEdit(idUser);
                         break;
-                    case "createcard": response = getCreateCardManager();
+                    case "createcard": response = getCreateCardManager(idUser);
                         break;
                     case "newcomments": response = getCommentsForManager(idUser);
                         break;

@@ -20,8 +20,8 @@ public class CardManager {
         return cardRepository.findAllByIdOwn(idown);
     }
 
-    public static List<Card> readAllByIdOwnAndStatus(Long idown,String status) {
-        return cardRepository.findAllByIdOwnAndStatus(idown,status);
+    public static List<Card> readAllByIdExecutorAndStatus(Long idown,String status) {
+        return cardRepository.findAllByIdExecutorAndStatus(idown,status);
     }
     public static Optional<Card> readAllById(Long id) {
         return cardRepository.findAllById(id);

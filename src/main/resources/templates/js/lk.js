@@ -165,6 +165,16 @@ $(document).ready(function () {
                 return xhr;
             },
             success: function (data) {
+                if (data == "Файлы были успешно загружены!") {
+                    $('#namecard').val("");
+                    $('#desccard').val("");
+                    $('#itemSelect').val("");
+
+                    const label = document.getElementById('fileUpload1').nextElementSibling;
+                    const labelDefaultText = 'Кликните или перетащите файлы сюда для загрузки';
+                    label.textContent = labelDefaultText;
+                    $("#fileUpload1").val(null);
+                }
                 $("#progressBar").text(data);
             },
             error: function () {
@@ -278,6 +288,9 @@ $(document).ready(function () {
         let inputObject = $('#inputObject').val();
         let datestart = $('#datestart').val();
         let dateend = $('#dateend').val();
+        let fnameauthorcard = $('#fnameauthorcard').val();
+        let inameauthorcard = $('#inameauthorcard').val();
+        let onameauthorcard = $('#onameauthorcard').val();
         $.ajax({
             url: "/api/searchengineuser",
             type: "post",
@@ -287,7 +300,10 @@ $(document).ready(function () {
                 "inputstatus": inputStatus,
                 "inputobject": inputObject,
                 "datestart": datestart,
-                "dateend": dateend
+                "dateend": dateend,
+                "fnameauthorcard" : fnameauthorcard,
+                "inameauthorcard" : inameauthorcard,
+                "onameauthorcard" : onameauthorcard,
             },
             error:function(){$("#respsearch").html("Ошибка поиска");},
             beforeSend: function() {
@@ -310,6 +326,9 @@ $(document).ready(function () {
         let fnameauthorcard = $('#fnameauthorcard').val();
         let inameauthorcard = $('#inameauthorcard').val();
         let onameauthorcard = $('#onameauthorcard').val();
+        let fnameexcard = $('#fnameexcard').val();
+        let inameexcard = $('#inameexcard').val();
+        let onameexcard = $('#onameexcard').val();
         $.ajax({
             url: "/api/searchenginemanager",
             type: "post",
@@ -323,6 +342,9 @@ $(document).ready(function () {
                 "fnameauthorcard" : fnameauthorcard,
                 "inameauthorcard" : inameauthorcard,
                 "onameauthorcard" : onameauthorcard,
+                "fnameexcard" : fnameexcard,
+                "inameexcard" : inameexcard,
+                "onameexcard" : onameexcard
             },
             error:function(){$("#respsearch").html("Ошибка поиска");},
             beforeSend: function() {

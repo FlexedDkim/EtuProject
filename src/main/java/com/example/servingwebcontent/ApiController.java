@@ -417,6 +417,7 @@ public class ApiController {
             newCard.setIdOwn(idOwn);
             newCard.setDescription(descCard);
             newCard.setStatus("open");
+            newCard.setIdExecutor(idOwn);
             CardManager.createCard(newCard);
             return CardManager.createCard(newCard).getId();
         }
@@ -621,7 +622,7 @@ public class ApiController {
 
     @ResponseBody
     @PostMapping("/api/searchengineuser")
-    public Object SearchEngineUser(HttpSession session,@RequestParam(name="name", required=false) String name,@RequestParam(name="description", required=false) String description,@RequestParam(name="inputstatus", required=false) String status,@RequestParam(name="inputobject", required=false) Long object,@RequestParam(name="datestart", required=false) String datestart,@RequestParam(name="dateend", required=false) String dateend) {
+    public Object SearchEngineUser(HttpSession session,@RequestParam(name="name", required=false) String name,@RequestParam(name="description", required=false) String description,@RequestParam(name="inputstatus", required=false) String status,@RequestParam(name="inputobject", required=false) Long object,@RequestParam(name="datestart", required=false) String datestart,@RequestParam(name="dateend", required=false) String dateend,@RequestParam(name="fnameauthorcard", required=false) String fnameauthorcard,@RequestParam(name="inameauthorcard", required=false) String inameauthorcard,@RequestParam(name="onameauthorcard", required=false) String onameauthorcard) {
         @JsonInclude(JsonInclude.Include.NON_NULL)
         class SearchResponse {
             @JsonProperty("status")
@@ -660,7 +661,7 @@ public class ApiController {
         String mail = (String) session.getAttribute("user");
         User searchUser = userManager.getUserByMail(mail).get();
         for (Card card : cards) {
-            if (getBetwheenDates(datestart,dateend,card.getTime()) && searchUser.getId() == card.getIdOwn()) {
+            if (getBetwheenDates(datestart,dateend,card.getTime()) && (searchUser.getId() == card.getIdExecutor()) && userManager.searchUser(inameauthorcard,fnameauthorcard,onameauthorcard,searchUser.getId()).isPresent()) {
                 counter++;
                 resp += "<tr>\n" +
                         "      <th scope=\"row\">"+counter+"</th>\n" +
@@ -688,7 +689,7 @@ public class ApiController {
 
     @ResponseBody
     @PostMapping("/api/searchenginemanager")
-    public Object SearchEngineManager(HttpSession session,@RequestParam(name="name", required=false) String name,@RequestParam(name="description", required=false) String description,@RequestParam(name="inputstatus", required=false) String status,@RequestParam(name="inputobject", required=false) Long object,@RequestParam(name="datestart", required=false) String datestart,@RequestParam(name="dateend", required=false) String dateend,@RequestParam(name="fnameauthorcard", required=false) String fnameauthorcard,@RequestParam(name="inameauthorcard", required=false) String inameauthorcard,@RequestParam(name="onameauthorcard", required=false) String onameauthorcard) {
+    public Object SearchEngineManager(HttpSession session,@RequestParam(name="name", required=false) String name,@RequestParam(name="description", required=false) String description,@RequestParam(name="inputstatus", required=false) String status,@RequestParam(name="inputobject", required=false) Long object,@RequestParam(name="datestart", required=false) String datestart,@RequestParam(name="dateend", required=false) String dateend,@RequestParam(name="fnameauthorcard", required=false) String fnameauthorcard,@RequestParam(name="inameauthorcard", required=false) String inameauthorcard,@RequestParam(name="onameauthorcard", required=false) String onameauthorcard,@RequestParam(name="fnameexcard", required=false) String fnameexcard,@RequestParam(name="inameexcard", required=false) String inameexcard,@RequestParam(name="onameexcard", required=false) String onameexcard) {
         @JsonInclude(JsonInclude.Include.NON_NULL)
         class SearchResponse {
             @JsonProperty("status")
@@ -727,7 +728,8 @@ public class ApiController {
         String mail = (String) session.getAttribute("user");
         User searchUser = userManager.getUserByMail(mail).get();
         for (Card card : cards) {
-            if (getBetwheenDates(datestart,dateend,card.getTime()) && userManager.searchUser(inameauthorcard,fnameauthorcard,onameauthorcard,searchUser.getId()).isPresent()) {
+            User cardUserEx = userManager.getUserById(card.getIdExecutor()).get();
+            if (getBetwheenDates(datestart,dateend,card.getTime()) && userManager.searchUser(inameauthorcard,fnameauthorcard,onameauthorcard,searchUser.getId()).isPresent() && userManager.searchUser(inameexcard,fnameexcard,onameexcard,cardUserEx.getId()).isPresent()) {
                 counter++;
                 resp += "<tr>\n" +
                         "      <th scope=\"row\">"+counter+"</th>\n" +

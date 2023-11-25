@@ -142,6 +142,7 @@ public class MainFunction {
         UserManager userManager = null;
         Optional<User> userOptional = userManager.getUserById(idOwn);
         User userFunc = userOptional.get();
+        User userCard = userManager.getUserById(card.getIdExecutor()).get();
         String cardsHtmlBody = "";
         String filesHtml = "<div id=\"filecontainer"+card.getId()+"\" class=\"container\"><div class=\"card-deck\">";
         List<File> files = FileManager.readAllByIdCard(card.getId());
@@ -241,6 +242,10 @@ public class MainFunction {
                     "        <div class=\"form-group\">\n" +
                     "          <label for=\"FormControl\">Автор карточки</label>\n" +
                     "          <input type=\"text\" class=\"form-control\" value=\"" + userFunc.getFname() + " " + userFunc.getIname() + " " + userFunc.getOname() + "\" placeholder=\"\" disabled>\n" +
+                    "       </div>  " +
+                    "        <div class=\"form-group\">\n" +
+                            "          <label for=\"FormControl\">Исполнитель</label>\n" +
+                    "          <input type=\"text\" class=\"form-control\" value=\"" + userCard.getFname() + " " + userCard.getIname() + " " + userCard.getOname() + "\" placeholder=\"\" disabled>\n" +
                     "       </div>  "
                     + onchangestatus +
                     "       <label for=\"FormControl\">Прикреплённые файлы</label>\n"
@@ -455,11 +460,12 @@ public class MainFunction {
         UserManager userManager = null;
         Optional<User> userOptional = userManager.getUserById(idOwn);
         User userFunc = userOptional.get();
-        List<Card> cards = CardManager.readAllByIdOwnAndStatus(userFunc.getId(),"inwork");
+        List<Card> cards = CardManager.readAllByIdExecutorAndStatus(userFunc.getId(),"inwork");
 
         String cardsHtmlBody = "";
         String cardsHtml = "<div class=\"container\"><div class=\"card-deck\">";
         for (Card card : cards) {
+            User userCard = userManager.getUserById(card.getIdExecutor()).get();
             String filesHtml = "<div id=\"filecontainer"+card.getId()+"\" class=\"container\"><div class=\"card-deck\">";
             List<File> files = FileManager.readAllByIdCard(card.getId());
             for (File file : files) {
@@ -543,6 +549,10 @@ public class MainFunction {
                     "          <input type=\"text\" class=\"form-control\" value=\"" + userFunc.getFname() + " " + userFunc.getIname() + " " + userFunc.getOname() + "\" placeholder=\"\" disabled>\n" +
                     "       </div>  " +
                     "        <div class=\"form-group\">\n" +
+                    "          <label for=\"FormControl\">Исполнитель</label>\n" +
+                    "          <input type=\"text\" class=\"form-control\" value=\"" + userCard.getFname() + " " + userCard.getIname() + " " + userCard.getOname() + "\" placeholder=\"\" disabled>\n" +
+                    "       </div>  " +
+                    "        <div class=\"form-group\">\n" +
                     "          <label for=\"FormControl\">Статус</label>\n" +
                     "          <input type=\"text\" class=\"form-control\" value=\"" + status + "\" placeholder=\"\" disabled>\n" +
                     "       </div>  " +
@@ -593,7 +603,8 @@ public class MainFunction {
         String cardsHtml = "<div class=\"container\"><div class=\"card-deck\">";
         for (Card card : cards) {
             User userCard = userManager.getUserById(card.getIdOwn()).get();
-            if (idOwn != userCard.getIdManager()) {continue;}
+            User userCardEx = userManager.getUserById(card.getIdExecutor()).get();
+            if (idOwn != userCardEx.getIdManager()) {continue;}
             String filesHtml = "<div id=\"filecontainer"+card.getId()+"\" class=\"container\"><div class=\"card-deck\">";
             List<File> files = FileManager.readAllByIdCard(card.getId());
             for (File file : files) {
@@ -663,6 +674,10 @@ public class MainFunction {
                     "        <div class=\"form-group\">\n" +
                     "          <label for=\"FormControl\">Автор карточки</label>\n" +
                     "          <input type=\"text\" class=\"form-control\" value=\"" + userCard.getFname() + " " + userCard.getIname() + " " + userCard.getOname() + "\" placeholder=\"\" disabled>\n" +
+                    "       </div>  " +
+                    "        <div class=\"form-group\">\n" +
+                    "          <label for=\"FormControl\">Исполнитель</label>\n" +
+                    "          <input type=\"text\" class=\"form-control\" value=\"" + userCardEx.getFname() + " " + userCardEx.getIname() + " " + userCardEx.getOname() + "\" placeholder=\"\" disabled>\n" +
                     "       </div>  " +
                     "        <div class=\"form-group\">\n" +
                     "          <label for=\"FormControl\">Статус карточки</label>\n" +
@@ -758,6 +773,25 @@ public class MainFunction {
                 "                        </div>\n" +
                 "                </div>\n" +
                 "            </div>\n" +
+
+                "<div class=\"row\">\n" +
+                "                <div class=\"col\">\n" +
+                "                    <div class=\"form-group \">\n" +
+                " <input class=\"form-control\" id=\"fnameauthorcard\" type=\"text\" placeholder=\"Фамилия автора карточки\">" +
+                "                        </div>\n" +
+                "                </div>\n" +
+                "                <div class=\"col\">\n" +
+                "                    <div class=\"form-group \">\n" +
+                " <input class=\"form-control\" id=\"inameauthorcard\" type=\"text\" placeholder=\"Имя автора карточки\">" +
+                "                        </div>\n" +
+                "                </div>\n" +
+                "                <div class=\"col\">\n" +
+                "                    <div style=\"margin-bottom: 0rem;\" class=\"form-group \">\n" +
+                " <input class=\"form-control\" id=\"onameauthorcard\" type=\"text\" placeholder=\"Отчество автора карточки\">" +
+                "                        </div>\n" +
+                "                </div>\n" +
+                "            </div>\n" +
+
                 "<div class=\"row\">\n" +
                 "                <div class=\"col\">\n" +
                 "                    <div style=\"margin-bottom: 0rem;\" class=\"form-group \">\n" +
@@ -872,6 +906,24 @@ public class MainFunction {
 
                 "<div class=\"row\">\n" +
                 "                <div class=\"col\">\n" +
+                "                    <div class=\"form-group \">\n" +
+                " <input class=\"form-control\" id=\"fnameexcard\" type=\"text\" placeholder=\"Фамилия исполнителя карточки\">" +
+                "                        </div>\n" +
+                "                </div>\n" +
+                "                <div class=\"col\">\n" +
+                "                    <div class=\"form-group \">\n" +
+                " <input class=\"form-control\" id=\"inameexcard\" type=\"text\" placeholder=\"Имя исполнителя карточки\">" +
+                "                        </div>\n" +
+                "                </div>\n" +
+                "                <div class=\"col\">\n" +
+                "                    <div class=\"form-group \">\n" +
+                " <input class=\"form-control\" id=\"onameexcard\" type=\"text\" placeholder=\"Отчество исполнителя карточки\">" +
+                "                        </div>\n" +
+                "                </div>\n" +
+                "            </div>\n" +
+
+                "<div class=\"row\">\n" +
+                "                <div class=\"col\">\n" +
                 "                    <div style=\"margin-bottom: 0rem;\" class=\"form-group \">\n" +
                 " <input class=\"form-control\" id=\"fnameauthorcard\" type=\"text\" placeholder=\"Фамилия автора карточки\">" +
                 "                        </div>\n" +
@@ -901,8 +953,8 @@ public class MainFunction {
                 "</section>";
         return searchBar;
     }
-    public static String getCreateCardManager() {
-        return "<h1 class=\"display-4\">Загрузка файлов</h1>  " +
+    public static String getCreateCardManager(Long idUser) {
+        return "<h1 class=\"display-4\">Создание карточки</h1>  " +
                 "<div id=\"progressBar\"></div>" +
                 "<div class=\"form-group\">\n" +
                 "    <label for=\"FormControl\">Название</label>\n" +
