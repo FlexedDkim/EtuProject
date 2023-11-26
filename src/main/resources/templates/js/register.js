@@ -3,11 +3,8 @@ $(document).ready(function(){
         let mail   = $('#mail').val();
         let pass = $('#pass').val();
         let captchainput = $('#captchainput').val();
-<<<<<<< HEAD
         let pass_repeat = $('#pass_repeat').val();
-=======
         let passrepeat = $('#passrepeat').val();
->>>>>>> Dmitry/main
         $.ajax({
             url: "api/register",
             type: "post",
@@ -37,8 +34,4 @@ $(document).ready(function(){
         document.getElementById("captchainput").value = "";
         document.getElementById('captcha').src='api/captcha?' + Math.random();
     });
-<<<<<<< HEAD
 });
-=======
-});
->>>>>>> Dmitry/main
