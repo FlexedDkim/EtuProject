@@ -32,6 +32,8 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -411,7 +413,9 @@ public class ApiController {
             }
 
             HttpHeaders headers = new HttpHeaders();
-            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + realFileName + "\"");
+            String encodedFileName = URLEncoder.encode(realFileName, StandardCharsets.UTF_8);
+            String contentDisposition = "attachment; filename*=UTF-8''" + encodedFileName;
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, contentDisposition);
             return ResponseEntity.ok()
                     .headers(headers)
                     .contentType(MediaType.APPLICATION_OCTET_STREAM)
