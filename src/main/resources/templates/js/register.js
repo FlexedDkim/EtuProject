@@ -4,6 +4,7 @@ $(document).ready(function(){
         let pass = $('#pass').val();
         let captchainput = $('#captchainput').val();
         let pass_repeat = $('#pass_repeat').val();
+        let passrepeat = $('#passrepeat').val();
         $.ajax({
             url: "api/register",
             type: "post",
