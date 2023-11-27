@@ -368,7 +368,11 @@ public class ApiController {
             newCard.setDeleted(false);
             newCard.setIdOwn(idOwn);
             newCard.setDescription(descCard);
-            newCard.setStatus("open");
+            if (userManager.getUserById(idOwn).get().getUsertype() == 1) {
+                newCard.setStatus("open");
+            } else {
+                newCard.setStatus("inwork");
+            }
             if (userManager.getUserById(idOwn).get().getUsertype() != 2) {newCard.setIdExecutor(idOwn);} else {newCard.setIdExecutor(itemSelectEmployer);}
             CardManager.createCard(newCard);
             return CardManager.createCard(newCard).getId();
