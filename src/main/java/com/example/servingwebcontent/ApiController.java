@@ -54,6 +54,8 @@ public class ApiController {
     private CardManager cardManager;
     String response = "false";
     String securepass = "";
+
+    private static final String UPLOAD_DIR_AVATARS = "src/main/avatars/";
     @ResponseBody
     @PostMapping("/api/login")
     public String ApiLogin(HttpSession session,@RequestParam(name="mail", required=false) String mail, @RequestParam(name="pass", required=false) String pass, Model model) {
@@ -85,14 +87,14 @@ public class ApiController {
     }
     @ResponseBody
     @PostMapping("/api/register")
-    public String register(HttpSession session,@RequestParam(name="passrepeat", required=false) String passrepeat,@RequestParam(name="captcha", required=false) String captcha,@RequestParam(name="mail", required=false) String mail, @RequestParam(name="pass", required=false) String pass, Model model) {
+    public String register(HttpSession session,@RequestParam(name="passrepeat", required=false) String passrepeat,@RequestParam(name="captcha", required=false) String captcha,@RequestParam(name="mail", required=false) String mail, @RequestParam(name="pass", required=false) String pass, Model model,@RequestParam(name="iname", required=false) String iname,@RequestParam(name="fname", required=false) String fname,@RequestParam(name="oname", required=false) String oname) {
         mail = mail.trim();
         pass = pass.trim();
         captcha = captcha.trim();
         passrepeat = passrepeat.trim();
         long unixTimestamp = getCurrentTime();
         mail = mail.toLowerCase();
-        if (mail == "" || pass == "" || captcha == "" || passrepeat == "") {
+        if (mail == "" || pass == "" || captcha == "" || passrepeat == "" || iname == "" || fname == "" || oname == "") {
             return "Заполните все поля!";
         }
         if (!isValidEmail(mail)) {
@@ -119,9 +121,10 @@ public class ApiController {
         registerUser.setDelete(false);
         registerUser.setUsertype(0);
         registerUser.setIdManager(0L);
-        registerUser.setFname("");
-        registerUser.setIname("");
-        registerUser.setOname("");
+        registerUser.setFname(fname);
+        registerUser.setIname(iname);
+        registerUser.setOname(oname);
+        registerUser.setAvatar(0l);
         UserManager.createUser(registerUser);
         session.setAttribute("user", mail);
         return "Аккаунт зарегистрирован!";
@@ -295,12 +298,11 @@ public class ApiController {
             return "ok";
         }
         private String createTmpCard(File fileObj) throws IOException {
-            String delBtn = "&nbsp;&nbsp;<button type=\"button\" onclick=\"deleteFile('"+fileObj.getId()+"')\" id=\"btnDeletedFile" + fileObj.getId() + "\" class=\"btn bg-danger text-light\">Удалить</button>";
             return "<div id=\"filecard"+fileObj.getId()+"\" style=\"margin-bottom: 10px;\" class=\"card\">\n" +
                     "            <div class=\"card-body\">\n" +
                     "                <h5 id=\"namecard"+fileObj.getId()+"\" class=\"card-title\">" + fileObj.getRealName() + "</h5>\n" +
                     "                <p class=\"card-text\">" + convertFileSize(fileObj.getSize()) + "</p>\n" +
-                    "                <button type=\"button\" onclick=\"window.open('/api/download/" + fileObj.getId() + "');\" id=\"btnDownloadFile" + fileObj.getId() + "\" class=\"btn bg-main text-light\">Скачать</button>" + delBtn +
+                    "                <button type=\"button\" onclick=\"window.open('/api/download/" + fileObj.getId() + "');\" id=\"btnDownloadFile" + fileObj.getId() + "\" class=\"btn bg-main text-light\">Скачать</button>" +
                     "            </div>\n" +
                     "        </div>";
         }
@@ -771,13 +773,53 @@ public class ApiController {
                 userSave.setOname(value);
                 break;
             case "inputRoleForm":
-                userSave.setUsertype(Integer.parseInt(value));
+                if (Integer.parseInt(value) == 1) {
+                    userSave.setUsertype(Integer.parseInt(value));
+                }
+                else
+                {
+                    userSave.setUsertype(Integer.parseInt(value));
+                    userSave.setIdManager(0l);
+                }
                 break;
             case "inputManagersForm":
-                userSave.setIdManager(Long.parseLong(value));
+                if (userSave.getUsertype() == 1) {
+                    userSave.setIdManager(Long.parseLong(value));
+                }
+                else {
+                    return "Чтобы выдать менеджера, пожалуйста, измените тип пользователя.";
+                }
                 break;
         }
         userManager.createUser(userSave);
         return "Сохранено";
+    }
+    @ResponseBody
+    @PostMapping("/api/upload-image")
+    public String handleFileUpload(HttpSession session,@RequestParam("image") MultipartFile file) throws IOException {
+        String realFileName = file.getOriginalFilename();
+        String fileExtension = getFileExtension(realFileName);
+        if (realFileName.length() > 30) {return "Файл " + realFileName + " имеет слишком длинное имя!";}
+        if (!(fileExtension.equals("jpg") || fileExtension.equals("jpeg") || fileExtension.equals("png"))) {return "Тип файла " + fileExtension + " загружать нельзя!";}
+        if (file.getSize() > 52428800) {return "Файл " + realFileName + " превышает допустимый размер.";}
+        String genFileName = generateUniqueFileName();
+        Path filePath = Path.of(UPLOAD_DIR_AVATARS + genFileName + '.' + fileExtension);
+        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+        File newFile = new File();
+        newFile.setRealName(realFileName);
+        newFile.setGenName(genFileName);
+        newFile.setTime(getCurrentTime());
+        newFile.setType(fileExtension);
+        newFile.setSize(file.getSize());
+        newFile.setIdOwn(userManager.getUserByMail((String) session.getAttribute("user")).get().getId());
+        newFile.setIdCard(0L);
+        newFile.setDeleted(false);
+        FileManager.createFile(newFile);
+
+        User newUser = userManager.getUserByMail((String) session.getAttribute("user")).get();
+        newUser.setAvatar(FileManager.createFile(newFile).getId());
+        UserManager.createUser(newUser);
+
+        return "ok";
     }
 }

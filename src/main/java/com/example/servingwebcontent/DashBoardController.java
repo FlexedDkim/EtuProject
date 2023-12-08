@@ -15,6 +15,14 @@ public class DashBoardController {
     @GetMapping("/dashboard")
     public String dashboard(HttpSession session, Model model) {
         if (session.getAttribute("user") != null) {
+            switch (userManager.getUserByMail((String) session.getAttribute("user")).get().getUsertype()) {
+                case 1:
+                    return "redirect:/dashboard/edit";
+                case 2:
+                    return "redirect:/dashboard/view";
+                case 3:
+                    return "redirect:/dashboard/searchusers";
+            }
             String userSession = (String) session.getAttribute("user");
             Optional<User> userOptional = userManager.getUserByMail(userSession);
             User userDashBoard = userOptional.get();

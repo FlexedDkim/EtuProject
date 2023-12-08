@@ -438,3 +438,42 @@ function setupInput(input) {
         }
     });
 }
+
+document.querySelector('.upload-image').addEventListener('mouseenter', function() {
+    document.querySelector('.upload-icon').style.display = 'block';
+});
+
+document.querySelector('.upload-image').addEventListener('mouseleave', function() {
+    document.querySelector('.upload-icon').style.display = 'none';
+});
+
+document.querySelector('.upload-image').addEventListener('click', function() {
+    // Эмулируем клик на скрытом элементе fileInput
+    document.getElementById('fileInput').click();
+});
+
+document.getElementById('fileInput').addEventListener('change', function() {
+    var formData = new FormData();
+    var imageFile = this.files[0];
+    formData.append('image', imageFile);
+
+    fetch('/api/upload-image', {
+        method: 'POST',
+        body: formData
+    })
+        .then(function(response) {
+            if (!response.ok) {
+                throw new Error('Ошибка сервера: ' + response.status);
+            }
+            return response.text(); // Исправлено: разрешаем промис response.text()
+        })
+        .then(function(text) {
+            if (text === "ok") {
+                location.reload();
+            } else {
+                alert(text); // Показываем текст ошибки
+            }
+        })
+        .catch(function(error) {
+        });
+});

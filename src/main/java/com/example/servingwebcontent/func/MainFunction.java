@@ -157,14 +157,11 @@ public class MainFunction {
                 deletedAttribyte = "disabled";
                 deletedAttribyteName = "[Удалено]";
             }
-            if (idOwn == file.getIdOwn()) {
-                delBtn = "&nbsp;&nbsp;<button type=\"button\" onclick=\"deleteFile('"+file.getId()+"')\" id=\"btnDeletedFile" + file.getId() + "\" class=\"btn bg-danger text-light\" "+deletedAttribyte+">Удалить</button>";
-            }
             filesHtml += "<div id=\"filecard"+file.getId()+"\" style=\"margin-bottom: 10px;\" class=\"card\">\n" +
                     "            <div class=\"card-body\">\n" +
                     "                <h5 id=\"namecard"+file.getId()+"\" class=\"card-title\">" + file.getRealName() + " " + deletedAttribyteName + " </h5>\n" +
                     "                <p class=\"card-text\">" + convertFileSize(file.getSize()) + "</p>\n" +
-                    "                <button type=\"button\" onclick=\"window.open('/api/download/" + file.getId() + "');\" id=\"btnDownloadFile" + file.getId() + "\" class=\"btn bg-main text-light\" "+deletedAttribyte+">Скачать</button>" + delBtn +
+                    "                <button type=\"button\" onclick=\"window.open('/api/download/" + file.getId() + "');\" id=\"btnDownloadFile" + file.getId() + "\" class=\"btn bg-main text-light\" "+deletedAttribyte+">Скачать</button>" +
                     "            </div>\n" +
                     "        </div>";
         }
@@ -174,13 +171,21 @@ public class MainFunction {
             User userComment = userManager.getUserById(comment.getIdOwn()).get();
             String orientationComments = "second";
             if (comment.getIdOwn() != idOwn) {orientationComments = "second-resp";}
+            String pathToFoto = "";
+            if (userComment.getAvatar() == 0) {
+                pathToFoto = "../img/noavatar.png";
+            }
+            else {
+                File file = FileManager.readAllById(userComment.getAvatar()).get();
+                pathToFoto = "../avatars/" + file.getGenName() + "." + file.getType();
+            }
             commentsHtml +=
                     "    <div class=\"d-flex justify-content-center py-2\">\n" +
                             "        <div class=\""+orientationComments+" py-2 px-2\">\n" +
                             "            <span class=\"text1\">" + comment.getBody().replace("\n", "<br>") + "</span>\n" +
                             "            <div class=\"d-flex justify-content-between py-1 pt-2\">\n" +
                             "                <div>\n" +
-                            "                    <img src=\"../img/noavatar.png\" width=\"20\">\n" +
+                            "                    <img src=\""+pathToFoto+"\" width=\"20\">\n" +
                             "                    <span class=\"text2\">" + userComment.getFname() + " " + userComment.getIname().charAt(0) + ". " + userComment.getOname().charAt(0) + "." + "</span>\n" +
                             "                </div>\n" +
                             "                <div>\n" +
@@ -316,13 +321,27 @@ public class MainFunction {
                 prefix = "Администратор";
                 break;
         }
+        String pathToFoto = "";
+        if (userFunc.getAvatar() == 0) {
+            pathToFoto = "../img/noavatar.png";
+        }
+        else {
+            File file = FileManager.readAllById(userFunc.getAvatar()).get();
+            pathToFoto = "../avatars/" + file.getGenName() + "." + file.getType();
+        }
         String mainHtml = "<section style=\"background-color: #FF8C00;\">\n" +
                 "  <div class=\"container py-5\">\n" +
                 "    <div class=\"row\">\n" +
                 "      <div class=\"col-lg-4\">\n" +
                 "        <div class=\"card mb-4\">\n" +
                 "          <div class=\"card-body text-center\">\n" +
-                "            <img src=\"../img/noavatar.png\" alt=\"avatar\" class=\"rounded-circle img-fluid\" style=\"width: 150px;\">\n" +
+                "<input type=\"file\" id=\"fileInput\" style=\"display: none;\">" +
+                "<div class=\"image-upload-wrapper\">\n" +
+                "    <img src=\""+pathToFoto+"\" alt=\"Загружаемое изображение\" class=\"rounded-circle img-fluid upload-image\"/>\n" +
+                "    <div class=\"overlay\">\n" +
+                "        <div class=\"upload-icon\" style=\"display: none;\">Загрузить (только файлы формата png, jpg, jpeg)</div>\n" +
+                "    </div>\n" +
+                "</div>" +
                 "            <h5 class=\"my-3\">"+ userFunc.getFname() + " " + userFunc.getIname() +"</h5>\n" +
                 "            <p class=\"text-muted mb-1\">" + prefix + "</p>           \n" +
                 "          </div>\n" +
@@ -480,14 +499,11 @@ public class MainFunction {
                     deletedAttribyte = "disabled";
                     deletedAttribyteName = "[Удалено]";
                 }
-                if (idOwn == file.getIdOwn()) {
-                    delBtn = "&nbsp;&nbsp;<button type=\"button\" onclick=\"deleteFile('"+file.getId()+"')\" id=\"btnDeletedFile" + file.getId() + "\" class=\"btn bg-danger text-light\" "+deletedAttribyte+">Удалить</button>";
-                }
                 filesHtml += "<div id=\"filecard"+file.getId()+"\" style=\"margin-bottom: 10px;\" class=\"card\">\n" +
                         "            <div class=\"card-body\">\n" +
                         "                <h5 id=\"namecard"+file.getId()+"\" class=\"card-title\">" + file.getRealName() + " " + deletedAttribyteName + " </h5>\n" +
                         "                <p class=\"card-text\">" + convertFileSize(file.getSize()) + "</p>\n" +
-                        "                <button type=\"button\" onclick=\"window.open('/api/download/" + file.getId() + "');\" id=\"btnDownloadFile" + file.getId() + "\" class=\"btn bg-main text-light\" "+deletedAttribyte+">Скачать</button>" + delBtn +
+                        "                <button type=\"button\" onclick=\"window.open('/api/download/" + file.getId() + "');\" id=\"btnDownloadFile" + file.getId() + "\" class=\"btn bg-main text-light\" "+deletedAttribyte+">Скачать</button>" +
                         "            </div>\n" +
                         "        </div>";
             }
@@ -497,13 +513,21 @@ public class MainFunction {
                 User userComment = userManager.getUserById(comment.getIdOwn()).get();
                 String orientationComments = "second";
                 if (comment.getIdOwn() != idOwn) {orientationComments = "second-resp";}
+                String pathToFoto = "";
+                if (userComment.getAvatar() == 0) {
+                    pathToFoto = "../img/noavatar.png";
+                }
+                else {
+                    File file = FileManager.readAllById(userComment.getAvatar()).get();
+                    pathToFoto = "../avatars/" + file.getGenName() + "." + file.getType();
+                }
                 commentsHtml +=
                         "    <div class=\"d-flex justify-content-center py-2\">\n" +
                                 "        <div class=\""+orientationComments+" py-2 px-2\">\n" +
                                 "            <span class=\"text1\">" + comment.getBody().replace("\n", "<br>") + "</span>\n" +
                                 "            <div class=\"d-flex justify-content-between py-1 pt-2\">\n" +
                                 "                <div>\n" +
-                                "                    <img src=\"../img/noavatar.png\" width=\"20\">\n" +
+                                "                    <img src=\""+pathToFoto+"\" width=\"20\">\n" +
                                 "                    <span class=\"text2\">" + userComment.getFname() + " " + userComment.getIname().charAt(0) + ". " + userComment.getOname().charAt(0) + "." + "</span>\n" +
                                 "                </div>\n" +
                                 "                <div>\n" +
@@ -619,14 +643,11 @@ public class MainFunction {
                     deletedAttribyte = "disabled";
                     deletedAttribyteName = "[Удалено]";
                 }
-                if (idOwn == file.getIdOwn()) {
-                    delBtn = "&nbsp;&nbsp;<button type=\"button\" onclick=\"deleteFile('"+file.getId()+"')\" id=\"btnDeletedFile" + file.getId() + "\" class=\"btn bg-danger text-light\" "+deletedAttribyte+">Удалить</button>";
-                }
                 filesHtml += "<div id=\"filecard"+file.getId()+"\" style=\"margin-bottom: 10px;\" class=\"card\">\n" +
                         "            <div class=\"card-body\">\n" +
                         "                <h5 id=\"namecard"+file.getId()+"\" class=\"card-title\">" + file.getRealName() + " " + deletedAttribyteName + " </h5>\n" +
                         "                <p class=\"card-text\">" + convertFileSize(file.getSize()) + "</p>\n" +
-                        "                <button type=\"button\" onclick=\"window.open('/api/download/" + file.getId() + "');\" id=\"btnDownloadFile" + file.getId() + "\" class=\"btn bg-main text-light\" "+deletedAttribyte+">Скачать</button>" + delBtn +
+                        "                <button type=\"button\" onclick=\"window.open('/api/download/" + file.getId() + "');\" id=\"btnDownloadFile" + file.getId() + "\" class=\"btn bg-main text-light\" "+deletedAttribyte+">Скачать</button>" +
                         "            </div>\n" +
                         "        </div>";
             }
@@ -636,13 +657,21 @@ public class MainFunction {
                 User userComment = userManager.getUserById(comment.getIdOwn()).get();
                 String orientationComments = "second";
                 if (comment.getIdOwn() != idOwn) {orientationComments = "second-resp";}
+                String pathToFoto = "";
+                if (userComment.getAvatar() == 0) {
+                    pathToFoto = "../img/noavatar.png";
+                }
+                else {
+                    File file = FileManager.readAllById(userComment.getAvatar()).get();
+                    pathToFoto = "../avatars/" + file.getGenName() + "." + file.getType();
+                }
                 commentsHtml +=
                         "    <div class=\"d-flex justify-content-center py-2\">\n" +
                                 "        <div class=\""+orientationComments+" py-2 px-2\">\n" +
                                 "            <span class=\"text1\">" + comment.getBody().replace("\n", "<br>") + "</span>\n" +
                                 "            <div class=\"d-flex justify-content-between py-1 pt-2\">\n" +
                                 "                <div>\n" +
-                                "                    <img src=\"../img/noavatar.png\" width=\"20\">\n" +
+                                "                    <img src=\""+pathToFoto+"\" width=\"20\">\n" +
                                 "                    <span class=\"text2\">" + userComment.getFname() + " " + userComment.getIname().charAt(0) + ". " + userComment.getOname().charAt(0) + "." + "</span>\n" +
                                 "                </div>\n" +
                                 "                <div>\n" +
@@ -1181,7 +1210,7 @@ public class MainFunction {
                 "       </div>  " +
                 "       <div class=\"form-group \">\n" +
                 "          <label for=\"FormControl\">Роль</label>\n" +
-                "                          <select data-respinput=\"small7resp\" data-id=\""+user.getId()+"\" id=\"inputRoleForm"+user.getId()+"\" class=\"form-control\" >\n" +
+                "                          <select onchange=\"if (this.value=='1') {$('#inputManagersForm"+user.getId()+"').prop('disabled', false);} else {$('#inputManagersForm"+user.getId()+"').prop('disabled', true);}\" data-respinput=\"small7resp\" data-id=\""+user.getId()+"\" id=\"inputRoleForm"+user.getId()+"\" class=\"form-control\" >\n" +
                 "                            <option " + selected0 + " value=\"0\">Неактивированный</option>\n" +
                 "                            <option " + selected1 + " value=\"1\">Рабочий</option>\n" +
                 "                            <option " + selected2 + " value=\"2\">Менеджер</option>\n" +
