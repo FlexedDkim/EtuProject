@@ -822,4 +822,53 @@ public class ApiController {
 
         return "ok";
     }
+    @ResponseBody
+    @PostMapping("/api/nonnewpasscreate")
+    public String ApiNonRefreshGenPassword(HttpSession session, @RequestParam(name="pass", required=false) String pass,@RequestParam(name="passrepeat", required=false) String passRepeat,@RequestParam(name="mail", required=false) String mail) {
+        pass = pass.trim();
+        passRepeat = passRepeat.trim();
+        if (!passRepeat.equals(pass)) {return "Введённые пароли не совпадают!";}
+        if (pass == "" || passRepeat == "" || mail == "") {return "Заполните поля!";}
+        if (!isValidEmail(mail)) {
+            return "Почта невалидна!";
+        }
+        Optional<User> userOptional = UserManager.getUserByMail(mail);
+        User user = userOptional.orElse(null);
+        if (user == null) {
+            return "Такого аккаунта не существует";
+        }
+        session.setAttribute("userauth",mail);
+        String code = generateRandomStringNum(5);
+        String salt = generateRandomString(10);
+        securepass = md5( salt + md5(salt + pass + salt));
+        session.setAttribute("gencodeCode", code);
+        session.setAttribute("gencodeTime", getCurrentTime());
+        session.setAttribute("gencodePass", securepass);
+        session.setAttribute("gencodeSalt", salt);
+        session.setAttribute("gencodeAttempts", 0);
+        mailController.sendEmail(mail,"Смена пароля в вашем аккаунте.","Здравствуйте! Ваш код подтверждения для смены пароля: " + code + " . Код действителен 5 минут.");
+        return "ok";
+    }
+    @ResponseBody
+    @PostMapping("/api/nonnewpasscheck")
+    public String ApiNonCheckGenPassword(HttpSession session,@RequestParam(name="code", required=false) String code) {
+        if ((int) session.getAttribute("gencodeAttempts") >= 3) {return "Вы исчерпали лимит попыток.";}
+        Long oldTime = (Long) session.getAttribute("gencodeTime");
+        Long newTime = getCurrentTime();
+        if (newTime - oldTime > 300) {return "Время действия кода вышло.";}
+        if (!code.equals((String) session.getAttribute("gencodeCode"))) {
+            session.setAttribute("gencodeAttempts", (int) session.getAttribute("gencodeAttempts")+1);
+            int Attempts = 3 - (int) session.getAttribute("gencodeAttempts");
+            return "Код неверный! (Осталось " + Attempts + " попытки(а))";
+        }
+        else {
+            String mail = (String) session.getAttribute("userauth");
+            User updateUser = userManager.getUserByMail(mail).get();
+            updateUser.setSalt((String) session.getAttribute("gencodeSalt"));
+            updateUser.setPass((String) session.getAttribute("gencodePass"));
+            UserManager.createUser(updateUser);
+            session.setAttribute("user", mail);
+            return "ok";
+        }
+    }
 }
