@@ -40,4 +40,15 @@ public class MainController {
         }
     }
 
+    @GetMapping("/restore")
+    public String restore(HttpSession session,Model model) {
+        if (session.getAttribute("user") == null) {
+            return "restore";
+        }
+        else
+        {
+            return "redirect:/dashboard";
+        }
+    }
+
 }

@@ -1,0 +1,71 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=0.75, user-scalable=no">
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="../css/lk.css">
+  <link rel="stylesheet" href="css/relogin.css">
+  <link href="img/favicon.jpeg" rel="icon">
+  <title>Восстановление пароля</title>
+</head>
+<body style="">
+<div class="modal fade" id="modalRestorePass" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Сброс пароля</h5>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label  id="newpassresp">Введите почту</label>
+          <input type="text" class="form-control" id="mailcheck" placeholder="Введите вашу почту">
+        </div>
+        <div class="form-group">
+          <label >Введите пароль</label>
+          <input type="password" class="form-control" id="newpass" placeholder="Введите новый пароль">
+        </div>
+        <div class="form-group">
+          <label >Повторите пароль</label>
+          <input type="password" class="form-control" id="newpassrepeat" placeholder="Повторите новый пароль">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <a type="button" class="btn btn-secondary" href="../login">Закрыть</a>
+        <button type="submit" id="newpassbtn" class="btn bg-main text-light">Изменить пароль</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="modalRestorePassCode" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Сброс пароля</h5>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label id="newcodepassresp">Введите код</label>
+          <input type="text" class="form-control" id="newcodepass" placeholder="Введите код, который пришёл вам привязанную почту">
+        </div>
+        <button type="submit" id="newcodepassbtn" class="btn bg-main text-light">Ввести код</button>
+      </div>
+      <div class="modal-footer">
+        <a type="button" class="btn btn-secondary" href="../login">Закрыть</a>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+<script src="js/jquery.js"></script>
+<script src="js/login.js"></script>
+<script src="js/enterbuttonform.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script type="text/javascript">
+  $(window).on('load', function() {
+    $('#modalRestorePass').modal('show');
+  });
+</script>
+</html>
