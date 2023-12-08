@@ -9,15 +9,11 @@ import com.example.servingwebcontent.managers.FileManager;
 import com.example.servingwebcontent.managers.UserManager;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.springframework.core.io.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.core.io.UrlResource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -31,9 +27,6 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -56,8 +49,6 @@ public class ApiController {
     private CardManager cardManager;
     String response = "false";
     String securepass = "";
-
-    private static final String UPLOAD_DIR_AVATARS = "src/main/avatars/";
     @ResponseBody
     @PostMapping("/api/login")
     public String ApiLogin(HttpSession session,@RequestParam(name="mail", required=false) String mail, @RequestParam(name="pass", required=false) String pass, Model model) {
@@ -89,14 +80,14 @@ public class ApiController {
     }
     @ResponseBody
     @PostMapping("/api/register")
-    public String register(HttpSession session,@RequestParam(name="passrepeat", required=false) String passrepeat,@RequestParam(name="captcha", required=false) String captcha,@RequestParam(name="mail", required=false) String mail, @RequestParam(name="pass", required=false) String pass, Model model,@RequestParam(name="iname", required=false) String iname,@RequestParam(name="fname", required=false) String fname,@RequestParam(name="oname", required=false) String oname) {
+    public String register(HttpSession session,@RequestParam(name="passrepeat", required=false) String passrepeat,@RequestParam(name="captcha", required=false) String captcha,@RequestParam(name="mail", required=false) String mail, @RequestParam(name="pass", required=false) String pass, Model model) {
         mail = mail.trim();
         pass = pass.trim();
         captcha = captcha.trim();
         passrepeat = passrepeat.trim();
         long unixTimestamp = getCurrentTime();
         mail = mail.toLowerCase();
-        if (mail == "" || pass == "" || captcha == "" || passrepeat == "" || iname == "" || fname == "" || oname == "") {
+        if (mail == "" || pass == "" || captcha == "" || passrepeat == "") {
             return "Заполните все поля!";
         }
         if (!isValidEmail(mail)) {
@@ -123,10 +114,9 @@ public class ApiController {
         registerUser.setDelete(false);
         registerUser.setUsertype(0);
         registerUser.setIdManager(0L);
-        registerUser.setFname(fname);
-        registerUser.setIname(iname);
-        registerUser.setOname(oname);
-        registerUser.setAvatar(0l);
+        registerUser.setFname("");
+        registerUser.setIname("");
+        registerUser.setOname("");
         UserManager.createUser(registerUser);
         session.setAttribute("user", mail);
         return "Аккаунт зарегистрирован!";
@@ -300,11 +290,12 @@ public class ApiController {
             return "ok";
         }
         private String createTmpCard(File fileObj) throws IOException {
+            String delBtn = "&nbsp;&nbsp;<button type=\"button\" onclick=\"deleteFile('"+fileObj.getId()+"')\" id=\"btnDeletedFile" + fileObj.getId() + "\" class=\"btn bg-danger text-light\">Удалить</button>";
             return "<div id=\"filecard"+fileObj.getId()+"\" style=\"margin-bottom: 10px;\" class=\"card\">\n" +
                     "            <div class=\"card-body\">\n" +
                     "                <h5 id=\"namecard"+fileObj.getId()+"\" class=\"card-title\">" + fileObj.getRealName() + "</h5>\n" +
                     "                <p class=\"card-text\">" + convertFileSize(fileObj.getSize()) + "</p>\n" +
-                    "                <button type=\"button\" onclick=\"window.open('/api/download/" + fileObj.getId() + "');\" id=\"btnDownloadFile" + fileObj.getId() + "\" class=\"btn bg-main text-light\">Скачать</button>" +
+                    "                <button type=\"button\" onclick=\"window.open('/api/download/" + fileObj.getId() + "');\" id=\"btnDownloadFile" + fileObj.getId() + "\" class=\"btn bg-main text-light\">Скачать</button>" + delBtn +
                     "            </div>\n" +
                     "        </div>";
         }
@@ -379,45 +370,25 @@ public class ApiController {
     @Controller
     @RequestMapping("/api/download")
     public class FileDownloadController {
-
-        private final Path uploadDirectory = Paths.get("src/main/resources/uploads/").toAbsolutePath().normalize();
-
-        @GetMapping("/{originalId}")
-        public ResponseEntity<Resource> downloadFile(@PathVariable Long originalId, HttpSession session) {
-            if (session.getAttribute("user") == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-            }
-
+        private final String uploadDirectory = "uploads/";
+        @GetMapping("/{originalId:.+}")
+        public ResponseEntity<InputStreamResource> downloadFile(@PathVariable Long originalId,HttpSession session) throws IOException {
+            if (session.getAttribute("user") == null) {return ResponseEntity.notFound().build();}
             Optional<File> downloadFile = fileManager.readAllById(originalId);
-            if (!downloadFile.isPresent()) {
+            if (!downloadFile.isPresent()) {return ResponseEntity.notFound().build();}
+            String RealFileName = downloadFile.get().getRealName();
+            String originalFileName = downloadFile.get().getGenName();
+            String filePath = uploadDirectory + originalFileName + "." + downloadFile.get().getType();
+            ClassPathResource classPathResource = new ClassPathResource(filePath);
+            if (!classPathResource.exists()) {
                 return ResponseEntity.notFound().build();
             }
-
-            File fileInfo = downloadFile.get();
-            String realFileName = fileInfo.getRealName();
-            String generatedFileName = fileInfo.getGenName();
-            String fileExtension = fileInfo.getType();
-
-            Path filePath = uploadDirectory.resolve(generatedFileName + "." + fileExtension);
-
-            if (!Files.exists(filePath)) {
-                return ResponseEntity.notFound().build();
-            }
-
-            Resource resource;
-            try {
-                resource = new UrlResource(filePath.toUri());
-                if (!resource.exists()) {
-                    return ResponseEntity.notFound().build();
-                }
-            } catch (MalformedURLException e) {
-                return ResponseEntity.internalServerError().build();
-            }
-
+            Path tempFilePath = Files.createTempFile("tempFile-", RealFileName);
+            Files.copy(classPathResource.getInputStream(), tempFilePath, StandardCopyOption.REPLACE_EXISTING);
+            InputStream inputStream = Files.newInputStream(tempFilePath);
+            InputStreamResource resource = new InputStreamResource(inputStream);
             HttpHeaders headers = new HttpHeaders();
-            String encodedFileName = URLEncoder.encode(realFileName, StandardCharsets.UTF_8);
-            String contentDisposition = "attachment; filename*=UTF-8''" + encodedFileName;
-            headers.add(HttpHeaders.CONTENT_DISPOSITION, contentDisposition);
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + RealFileName);
             return ResponseEntity.ok()
                     .headers(headers)
                     .contentType(MediaType.APPLICATION_OCTET_STREAM)
@@ -777,102 +748,13 @@ public class ApiController {
                 userSave.setOname(value);
                 break;
             case "inputRoleForm":
-                if (Integer.parseInt(value) == 1) {
-                    userSave.setUsertype(Integer.parseInt(value));
-                }
-                else
-                {
-                    userSave.setUsertype(Integer.parseInt(value));
-                    userSave.setIdManager(0l);
-                }
+                userSave.setUsertype(Integer.parseInt(value));
                 break;
             case "inputManagersForm":
-                if (userSave.getUsertype() == 1) {
-                    userSave.setIdManager(Long.parseLong(value));
-                }
-                else {
-                    return "Чтобы выдать менеджера, пожалуйста, измените тип пользователя.";
-                }
+                userSave.setIdManager(Long.parseLong(value));
                 break;
         }
         userManager.createUser(userSave);
         return "Сохранено";
-    }
-    @ResponseBody
-    @PostMapping("/api/upload-image")
-    public String handleFileUpload(HttpSession session,@RequestParam("image") MultipartFile file) throws IOException {
-        String realFileName = file.getOriginalFilename();
-        String fileExtension = getFileExtension(realFileName);
-        if (realFileName.length() > 30) {return "Файл " + realFileName + " имеет слишком длинное имя!";}
-        if (!(fileExtension.equals("jpg") || fileExtension.equals("jpeg") || fileExtension.equals("png"))) {return "Тип файла " + fileExtension + " загружать нельзя!";}
-        if (file.getSize() > 52428800) {return "Файл " + realFileName + " превышает допустимый размер.";}
-        String genFileName = generateUniqueFileName();
-        Path filePath = Path.of(UPLOAD_DIR_AVATARS + genFileName + '.' + fileExtension);
-        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-        File newFile = new File();
-        newFile.setRealName(realFileName);
-        newFile.setGenName(genFileName);
-        newFile.setTime(getCurrentTime());
-        newFile.setType(fileExtension);
-        newFile.setSize(file.getSize());
-        newFile.setIdOwn(userManager.getUserByMail((String) session.getAttribute("user")).get().getId());
-        newFile.setIdCard(0L);
-        newFile.setDeleted(false);
-        FileManager.createFile(newFile);
-
-        User newUser = userManager.getUserByMail((String) session.getAttribute("user")).get();
-        newUser.setAvatar(FileManager.createFile(newFile).getId());
-        UserManager.createUser(newUser);
-
-        return "ok";
-    }
-    @ResponseBody
-    @PostMapping("/api/nonnewpasscreate")
-    public String ApiNonRefreshGenPassword(HttpSession session, @RequestParam(name="pass", required=false) String pass,@RequestParam(name="passrepeat", required=false) String passRepeat,@RequestParam(name="mail", required=false) String mail) {
-        pass = pass.trim();
-        passRepeat = passRepeat.trim();
-        if (!passRepeat.equals(pass)) {return "Введённые пароли не совпадают!";}
-        if (pass == "" || passRepeat == "" || mail == "") {return "Заполните поля!";}
-        if (!isValidEmail(mail)) {
-            return "Почта невалидна!";
-        }
-        Optional<User> userOptional = UserManager.getUserByMail(mail);
-        User user = userOptional.orElse(null);
-        if (user == null) {
-            return "Такого аккаунта не существует";
-        }
-        session.setAttribute("userauth",mail);
-        String code = generateRandomStringNum(5);
-        String salt = generateRandomString(10);
-        securepass = md5( salt + md5(salt + pass + salt));
-        session.setAttribute("gencodeCode", code);
-        session.setAttribute("gencodeTime", getCurrentTime());
-        session.setAttribute("gencodePass", securepass);
-        session.setAttribute("gencodeSalt", salt);
-        session.setAttribute("gencodeAttempts", 0);
-        mailController.sendEmail(mail,"Смена пароля в вашем аккаунте.","Здравствуйте! Ваш код подтверждения для смены пароля: " + code + " . Код действителен 5 минут.");
-        return "ok";
-    }
-    @ResponseBody
-    @PostMapping("/api/nonnewpasscheck")
-    public String ApiNonCheckGenPassword(HttpSession session,@RequestParam(name="code", required=false) String code) {
-        if ((int) session.getAttribute("gencodeAttempts") >= 3) {return "Вы исчерпали лимит попыток.";}
-        Long oldTime = (Long) session.getAttribute("gencodeTime");
-        Long newTime = getCurrentTime();
-        if (newTime - oldTime > 300) {return "Время действия кода вышло.";}
-        if (!code.equals((String) session.getAttribute("gencodeCode"))) {
-            session.setAttribute("gencodeAttempts", (int) session.getAttribute("gencodeAttempts")+1);
-            int Attempts = 3 - (int) session.getAttribute("gencodeAttempts");
-            return "Код неверный! (Осталось " + Attempts + " попытки(а))";
-        }
-        else {
-            String mail = (String) session.getAttribute("userauth");
-            User updateUser = userManager.getUserByMail(mail).get();
-            updateUser.setSalt((String) session.getAttribute("gencodeSalt"));
-            updateUser.setPass((String) session.getAttribute("gencodePass"));
-            UserManager.createUser(updateUser);
-            session.setAttribute("user", mail);
-            return "ok";
-        }
     }
 }
