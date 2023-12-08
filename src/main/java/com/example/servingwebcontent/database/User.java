@@ -40,6 +40,9 @@ public class User {
     @Column(name = "idmanager")
     private Long idManager;
 
+    @Column(name = "avatar")
+    private Long avatar;
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -64,6 +67,10 @@ public class User {
 
     public void setIdManager(Long idmanager) {
         this.idManager = idmanager;
+    }
+
+    public void setAvatar(Long avatar) {
+        this.avatar = avatar;
     }
 
     public Long getId() {
@@ -106,6 +113,10 @@ public class User {
 
     public Long getIdManager() {
         return idManager;
+    }
+
+    public Long getAvatar() {
+        return avatar;
     }
 
 }
