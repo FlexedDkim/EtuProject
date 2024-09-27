@@ -36,6 +36,13 @@ public class User {
 
     @Column(name = "usertype")
     private int usertype;
+
+    @Column(name = "idmanager")
+    private Long idManager;
+
+    @Column(name = "avatar")
+    private Long avatar;
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -54,9 +61,18 @@ public class User {
     public void setSalt(String salt) {
         this.salt = salt;
     }
-    public void setUsertype(String salt) {
+    public void setUsertype(int usertype) {
         this.usertype = usertype;
     }
+
+    public void setIdManager(Long idmanager) {
+        this.idManager = idmanager;
+    }
+
+    public void setAvatar(Long avatar) {
+        this.avatar = avatar;
+    }
+
     public Long getId() {
         return id;
     }
@@ -94,5 +110,13 @@ public class User {
     }
 
     public String getFname() {return fname;}
+
+    public Long getIdManager() {
+        return idManager;
+    }
+
+    public Long getAvatar() {
+        return avatar;
+    }
 
 }

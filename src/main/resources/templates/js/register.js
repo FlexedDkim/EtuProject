@@ -3,12 +3,20 @@ $(document).ready(function(){
         let mail   = $('#mail').val();
         let pass = $('#pass').val();
         let captchainput = $('#captchainput').val();
+        let pass_repeat = $('#pass_repeat').val();
         let passrepeat = $('#passrepeat').val();
+        let iname   = $('#iname').val();
+        let fname   = $('#fname').val();
+        let oname   = $('#oname').val();
+
         $.ajax({
             url: "api/register",
             type: "post",
             data: {
                 "mail":   mail,
+                "iname":   iname,
+                "fname":   fname,
+                "oname":   oname,
                 "pass":   pass,
                 "captcha":   captchainput,
                 "passrepeat":   passrepeat
