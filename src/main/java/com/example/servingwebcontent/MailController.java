@@ -10,7 +10,7 @@ import java.util.Properties;
 public class MailController {
     public static void sendEmail(String recipient, String subject, String body) {
         final String username = "eturobot@tonrondev.ru";
-        final String password = "robot*Q1bot";
+        final String password = "";
 
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
